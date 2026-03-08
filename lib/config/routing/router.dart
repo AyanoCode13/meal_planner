@@ -1,9 +1,11 @@
 import 'package:go_router/go_router.dart';
 import 'package:meal_planner/config/routing/routes/product.routes.dart';
+import 'package:meal_planner/config/routing/routes/recipe.routes.dart';
 import 'package:meal_planner/ui/navigation/bottom.navigation.dart';
 import 'package:meal_planner/ui/screens/product/add/screen.dart';
 import 'package:meal_planner/ui/screens/product/all/screen.dart';
 import 'package:meal_planner/ui/screens/product/id/screen.dart';
+import 'package:meal_planner/ui/screens/recipe/add/screen.dart';
 import 'package:meal_planner/ui/viewModels/product.viewModel.dart';
 import 'package:provider/provider.dart';
 
@@ -34,6 +36,10 @@ final List<GoRoute> _recipeRoutes = [
     path: ProductRoutes.viewAll,
     builder: (context, state) => const ProductViewAllScreen(),
   ),
+  GoRoute(
+    path: RecipeRoutes.add,
+    builder: (context, state) => AddRecipeScreen(),
+  )
 ];
 
 
@@ -46,5 +52,6 @@ GoRouter router() => GoRouter(
       builder: (context, state) => AppBottomNavigation()
     ),
     ..._productRoutes,
+    ..._recipeRoutes,
   ]
 );

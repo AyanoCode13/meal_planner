@@ -17,25 +17,25 @@ final class LocalRecipeRepsitory implements Repository<RecipeEntity>{
   Future<Result<void>> add(RecipeEntity input) async {
     // TODO: implement add
     try{
-      late final String path;
-      if(input.image != null){
-        path = await _fileStorageService.saveFile(
-          input.image!,
-          input.id,
-        );
-      }
+      // late String image;
+      // if(input.image != null){
+      //   image = await _fileStorageService.saveFile(
+      //     input.image!,
+      //     input.id,
+      //   );
+      // }
 
-      final recipe = RecipeModel(
-        id: input.id,
-        name: input.name,
-        description: input.description ?? "",
-        price: input.price,
-        image: path,
-        preparationTime: input.preparationTime,
-      );
-      final res = await _recipeDAO.insertRecipe(recipe);
-      print("Recipe Created");
-      return Result.ok(res);
+      // final recipe = RecipeModel(
+      //   id: input.id,
+      //   name: input.name,
+      //   description: input.description,
+      //   price: input.price,
+      //   image: image,
+      //   preparationTime: input.preparationTime,
+      // );
+      // final res = await _recipeDAO.insertRecipe(recipe);
+      print(input);
+      return Result.ok(null);
       
     }on Exception catch(e){
       return Result.error(e);

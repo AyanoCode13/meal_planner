@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:meal_planner/domain/abstract/model.dart';
 import 'package:meal_planner/domain/dto/recipe/create.recipe.dto.dart';
 import 'package:uuid/uuid.dart';
 
@@ -15,7 +14,7 @@ abstract class RecipeEntity with _$RecipeEntity {
     required String name,
     required double price,
     required String preparationTime,
-    required String? description,
+    required String description,
     required File? image,
   }) = _RecipeEntity;
 

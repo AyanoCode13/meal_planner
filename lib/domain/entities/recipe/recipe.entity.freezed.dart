@@ -20,7 +20,7 @@ mixin _$RecipeEntity {
   String get name => throw _privateConstructorUsedError;
   double get price => throw _privateConstructorUsedError;
   String get preparationTime => throw _privateConstructorUsedError;
-  String? get description => throw _privateConstructorUsedError;
+  String get description => throw _privateConstructorUsedError;
   File? get image => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
@@ -39,7 +39,7 @@ abstract class $RecipeEntityCopyWith<$Res> {
       String name,
       double price,
       String preparationTime,
-      String? description,
+      String description,
       File? image});
 }
 
@@ -60,7 +60,7 @@ class _$RecipeEntityCopyWithImpl<$Res, $Val extends RecipeEntity>
     Object? name = null,
     Object? price = null,
     Object? preparationTime = null,
-    Object? description = freezed,
+    Object? description = null,
     Object? image = freezed,
   }) {
     return _then(_value.copyWith(
@@ -80,10 +80,10 @@ class _$RecipeEntityCopyWithImpl<$Res, $Val extends RecipeEntity>
           ? _value.preparationTime
           : preparationTime // ignore: cast_nullable_to_non_nullable
               as String,
-      description: freezed == description
+      description: null == description
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as String,
       image: freezed == image
           ? _value.image
           : image // ignore: cast_nullable_to_non_nullable
@@ -105,7 +105,7 @@ abstract class _$$RecipeEntityImplCopyWith<$Res>
       String name,
       double price,
       String preparationTime,
-      String? description,
+      String description,
       File? image});
 }
 
@@ -124,7 +124,7 @@ class __$$RecipeEntityImplCopyWithImpl<$Res>
     Object? name = null,
     Object? price = null,
     Object? preparationTime = null,
-    Object? description = freezed,
+    Object? description = null,
     Object? image = freezed,
   }) {
     return _then(_$RecipeEntityImpl(
@@ -144,10 +144,10 @@ class __$$RecipeEntityImplCopyWithImpl<$Res>
           ? _value.preparationTime
           : preparationTime // ignore: cast_nullable_to_non_nullable
               as String,
-      description: freezed == description
+      description: null == description
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as String,
       image: freezed == image
           ? _value.image
           : image // ignore: cast_nullable_to_non_nullable
@@ -177,7 +177,7 @@ class _$RecipeEntityImpl extends _RecipeEntity {
   @override
   final String preparationTime;
   @override
-  final String? description;
+  final String description;
   @override
   final File? image;
 
@@ -218,7 +218,7 @@ abstract class _RecipeEntity extends RecipeEntity {
       required final String name,
       required final double price,
       required final String preparationTime,
-      required final String? description,
+      required final String description,
       required final File? image}) = _$RecipeEntityImpl;
   const _RecipeEntity._() : super._();
 
@@ -231,7 +231,7 @@ abstract class _RecipeEntity extends RecipeEntity {
   @override
   String get preparationTime;
   @override
-  String? get description;
+  String get description;
   @override
   File? get image;
   @override

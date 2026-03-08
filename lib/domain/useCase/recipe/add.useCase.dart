@@ -18,10 +18,9 @@ final class AddRecipeUseCase extends UseCase<CreateRecipeDTO, void> {
     final res = await _repository.add(recipe);
     switch (res) {
       case Ok<void>():
-        break;
+        return Result.ok(recipe);
       case Error<void>():
         return Result.error(res.error);
     }
-    return Result.ok(recipe);
   }
 }

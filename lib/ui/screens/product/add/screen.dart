@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:path_provider/path_provider.dart';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
@@ -156,6 +156,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 children: [_nameFormField, _priceFormField, _quantityFormField],
               ),
             ),
+           
           ],
         ),
       ),

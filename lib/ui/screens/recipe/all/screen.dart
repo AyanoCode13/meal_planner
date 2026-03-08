@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:meal_planner/config/routing/routes/recipe.routes.dart';
 import 'package:meal_planner/domain/dto/recipe/create.recipe.dto.dart';
 import 'package:meal_planner/ui/screens/recipe/all/recipe.list.dart';
 import 'package:meal_planner/ui/viewModels/recipe.viewModel.dart';
@@ -7,7 +9,6 @@ import 'package:provider/provider.dart';
 final class RecipesViewAllScreen extends StatelessWidget {
   const RecipesViewAllScreen({super.key});
 
-  
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -22,17 +23,28 @@ final class RecipesViewAllScreen extends StatelessWidget {
           }
           return child!;
         },
-        child: ListenableBuilder(listenable: context.watch<RecipeViewModel>(), builder: (context, _) {
-          return CustomScrollView(slivers: [
-            SliverAppBar(title: Text('Recipes'), actions: [
-              IconButton.filled(onPressed: (){
-                context.read<RecipeViewModel>().add.execute(arg: CreateRecipeDTO(name: "New Recipe", ingredients: []));
-              }, icon: Icon(Icons.add))
-            ],),
-            RecipeList()
-          ]);
-        })
-      )
+        child: ListenableBuilder(
+          listenable: context.watch<RecipeViewModel>(),
+          builder: (context, _) {
+            return CustomScrollView(
+              slivers: [
+                SliverAppBar(
+                  title: Text('Recipes'),
+                  actions: [
+                    IconButton.filled(
+                      onPressed: () {
+                        context.go(RecipeRoutes.add);
+                      },
+                      icon: Icon(Icons.add),
+                    ),
+                  ],
+                ),
+                RecipeList(),
+              ],
+            );
+          },
+        ),
+      ),
     );
   }
 }

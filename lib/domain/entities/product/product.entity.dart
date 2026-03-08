@@ -1,9 +1,9 @@
 import 'dart:io';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:meal_planner/domain/abstract/model.dart';
 import 'package:meal_planner/domain/dto/product/create.product.dto.dart';
 import 'package:uuid/uuid.dart';
+
 part 'product.entity.freezed.dart';
 
 @freezed

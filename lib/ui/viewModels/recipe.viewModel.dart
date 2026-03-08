@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:logger/web.dart';
 import 'package:meal_planner/domain/dto/recipe/create.recipe.dto.dart';
 import 'package:meal_planner/domain/entities/recipe/recipe.entity.dart';
 import 'package:meal_planner/domain/useCase/recipe/add.useCase.dart';
@@ -24,6 +25,8 @@ final class RecipeViewModel extends ChangeNotifier {
   late final ComplexCommand<void, CreateRecipeDTO> add;
   late BasicCommand load;
 
+  final Logger _logger = Logger();
+
   Future<Result<void>> _load() async {
     try {
       final res = await _getAllRecipesUseCase.call(input: null);
@@ -44,7 +47,7 @@ final class RecipeViewModel extends ChangeNotifier {
       final res = await _addRecipeUseCase.call(input: data);
       switch (res) {
         case Ok<RecipeEntity>():
-          await _load();
+         
           
           return Result.ok(null);
         case Error<RecipeEntity>():

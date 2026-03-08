@@ -23,10 +23,8 @@ final class LocalProductRepository implements Repository<ProductEntity> {
     // TODO: implement add
     try {
       late String image;
-      print(product.image);
       if (product.image != null) {
         image = await _fileStorageService.saveFile(product.image!, product.id);
-        print(image);
       }
       
       final ProductModel productModel = ProductModel(
@@ -51,10 +49,10 @@ final class LocalProductRepository implements Repository<ProductEntity> {
     try {
       print("Deleted Product with Id: $id");
       final res = await _productDAO.delete(id);
-      await _fileStorageService.deleteFiles("/products/$id");
+      await _fileStorageService.deleteFiles(id);
       return Result.ok(res);
     } on Exception catch (e) {
-      return Future.value(Result.error(e));
+      return Result.error(e);
     }
   }
 
@@ -75,7 +73,7 @@ final class LocalProductRepository implements Repository<ProductEntity> {
       }).toList();
       return Result.ok(await Future.wait(products));
     } on Exception catch (e) {
-      return Future.value(Result.error(e));
+      return Result.error(e);
     }
   }
 
@@ -94,7 +92,7 @@ final class LocalProductRepository implements Repository<ProductEntity> {
       );
       return Future.value(Result.ok(product));
     } on Exception catch (e) {
-      return Future.value(Result.error(e));
+      return Result.error(e);
     }
   }
 
@@ -120,7 +118,7 @@ final class LocalProductRepository implements Repository<ProductEntity> {
       );
       return Future.value(Result.ok(res));
     } on Exception catch (e) {
-      return Future.value(Result.error(e));
+      return Result.error(e);
     }
   }
 }
