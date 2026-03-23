@@ -3,7 +3,7 @@ import 'package:logger/logger.dart';
 import 'package:meal_planner/domain/dto/product/create.product.dto.dart';
 import 'package:meal_planner/domain/entities/product/product.entity.dart';
 import 'package:meal_planner/domain/useCase/product/add.useCase.dart';
-import 'package:meal_planner/domain/useCase/product/delele.useCase.dart';
+import 'package:meal_planner/domain/useCase/product/delete.useCase.dart';
 import 'package:meal_planner/domain/useCase/product/getAll.useCase.dart';
 import 'package:meal_planner/domain/useCase/product/getById.useCase.dart';
 import 'package:meal_planner/utils/command.dart';
@@ -39,13 +39,15 @@ final class ProductViewModel extends ChangeNotifier {
   List<ProductEntity> get searchedProducts => _searchedProducts;
 
   late ProductEntity? _product;
-  ProductEntity get product => _product!;
+  ProductEntity? get product => _product;
 
   late final BasicCommand load;
   late final ComplexCommand<void, CreateProductDTO> add;
   late final ComplexCommand<void, ProductEntity> delete;
   late final ComplexCommand<void, String> getById;
   late final ComplexCommand<void, String> search;
+
+  List<Command> get commands => [load, add, delete, getById];
   
     Future<Result<void>> _search(String query) async {
     try {
@@ -81,9 +83,9 @@ final class ProductViewModel extends ChangeNotifier {
     try {
       final res = await _getByIdUseCase.call(input: id);
       switch (res) {
-        case Ok<ProductEntity>():
+        case Ok<ProductEntity?>():
          _product = res.value;
-        case Error<ProductEntity>():
+        case Error<ProductEntity?>():
           Result.error(res.error);
       }
       return res;
@@ -114,7 +116,6 @@ final class ProductViewModel extends ChangeNotifier {
       await _load();
       switch (res) {
         case Ok<void>():
-          _products = List.from(_products)..remove(product);
           return Result.ok(null);
         case Error<void>():
           return Result.error(res.error);

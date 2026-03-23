@@ -12,7 +12,13 @@ class DeleteProductUseCase extends UseCase<String, void> {
   @override
   Future<Result<void>> call({required String input}) async {
     // TODO: implement call
-    return await _repository.delete(input);
+    try {
+      final res = await _repository.delete(input);
+      return Result.ok(res);
+    } on Exception catch (e) {
+      return Result.error(e);
+    }
+    
   }
 
 

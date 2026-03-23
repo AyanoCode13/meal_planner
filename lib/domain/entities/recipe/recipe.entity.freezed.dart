@@ -20,7 +20,8 @@ mixin _$RecipeEntity {
   String get name => throw _privateConstructorUsedError;
   double get price => throw _privateConstructorUsedError;
   String get preparationTime => throw _privateConstructorUsedError;
-  String get description => throw _privateConstructorUsedError;
+  String? get description => throw _privateConstructorUsedError;
+  List<ProductEntity> get ingredients => throw _privateConstructorUsedError;
   File? get image => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
@@ -39,7 +40,8 @@ abstract class $RecipeEntityCopyWith<$Res> {
       String name,
       double price,
       String preparationTime,
-      String description,
+      String? description,
+      List<ProductEntity> ingredients,
       File? image});
 }
 
@@ -60,7 +62,8 @@ class _$RecipeEntityCopyWithImpl<$Res, $Val extends RecipeEntity>
     Object? name = null,
     Object? price = null,
     Object? preparationTime = null,
-    Object? description = null,
+    Object? description = freezed,
+    Object? ingredients = null,
     Object? image = freezed,
   }) {
     return _then(_value.copyWith(
@@ -80,10 +83,14 @@ class _$RecipeEntityCopyWithImpl<$Res, $Val extends RecipeEntity>
           ? _value.preparationTime
           : preparationTime // ignore: cast_nullable_to_non_nullable
               as String,
-      description: null == description
+      description: freezed == description
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
+      ingredients: null == ingredients
+          ? _value.ingredients
+          : ingredients // ignore: cast_nullable_to_non_nullable
+              as List<ProductEntity>,
       image: freezed == image
           ? _value.image
           : image // ignore: cast_nullable_to_non_nullable
@@ -105,7 +112,8 @@ abstract class _$$RecipeEntityImplCopyWith<$Res>
       String name,
       double price,
       String preparationTime,
-      String description,
+      String? description,
+      List<ProductEntity> ingredients,
       File? image});
 }
 
@@ -124,7 +132,8 @@ class __$$RecipeEntityImplCopyWithImpl<$Res>
     Object? name = null,
     Object? price = null,
     Object? preparationTime = null,
-    Object? description = null,
+    Object? description = freezed,
+    Object? ingredients = null,
     Object? image = freezed,
   }) {
     return _then(_$RecipeEntityImpl(
@@ -144,10 +153,14 @@ class __$$RecipeEntityImplCopyWithImpl<$Res>
           ? _value.preparationTime
           : preparationTime // ignore: cast_nullable_to_non_nullable
               as String,
-      description: null == description
+      description: freezed == description
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
+      ingredients: null == ingredients
+          ? _value._ingredients
+          : ingredients // ignore: cast_nullable_to_non_nullable
+              as List<ProductEntity>,
       image: freezed == image
           ? _value.image
           : image // ignore: cast_nullable_to_non_nullable
@@ -165,8 +178,10 @@ class _$RecipeEntityImpl extends _RecipeEntity {
       required this.price,
       required this.preparationTime,
       required this.description,
+      required final List<ProductEntity> ingredients,
       required this.image})
-      : super._();
+      : _ingredients = ingredients,
+        super._();
 
   @override
   final String id;
@@ -177,13 +192,21 @@ class _$RecipeEntityImpl extends _RecipeEntity {
   @override
   final String preparationTime;
   @override
-  final String description;
+  final String? description;
+  final List<ProductEntity> _ingredients;
+  @override
+  List<ProductEntity> get ingredients {
+    if (_ingredients is EqualUnmodifiableListView) return _ingredients;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_ingredients);
+  }
+
   @override
   final File? image;
 
   @override
   String toString() {
-    return 'RecipeEntity(id: $id, name: $name, price: $price, preparationTime: $preparationTime, description: $description, image: $image)';
+    return 'RecipeEntity(id: $id, name: $name, price: $price, preparationTime: $preparationTime, description: $description, ingredients: $ingredients, image: $image)';
   }
 
   @override
@@ -198,12 +221,14 @@ class _$RecipeEntityImpl extends _RecipeEntity {
                 other.preparationTime == preparationTime) &&
             (identical(other.description, description) ||
                 other.description == description) &&
+            const DeepCollectionEquality()
+                .equals(other._ingredients, _ingredients) &&
             (identical(other.image, image) || other.image == image));
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType, id, name, price, preparationTime, description, image);
+  int get hashCode => Object.hash(runtimeType, id, name, price, preparationTime,
+      description, const DeepCollectionEquality().hash(_ingredients), image);
 
   @JsonKey(ignore: true)
   @override
@@ -218,7 +243,8 @@ abstract class _RecipeEntity extends RecipeEntity {
       required final String name,
       required final double price,
       required final String preparationTime,
-      required final String description,
+      required final String? description,
+      required final List<ProductEntity> ingredients,
       required final File? image}) = _$RecipeEntityImpl;
   const _RecipeEntity._() : super._();
 
@@ -231,7 +257,9 @@ abstract class _RecipeEntity extends RecipeEntity {
   @override
   String get preparationTime;
   @override
-  String get description;
+  String? get description;
+  @override
+  List<ProductEntity> get ingredients;
   @override
   File? get image;
   @override

@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:meal_planner/utils/command.dart';
 
 final class LoadingState extends StatelessWidget {
   final List<Command> _commands;
   final List<ChangeNotifier> _notifiers;
-  final Widget _child;
+  final Widget Function(BuildContext, Widget?) _child;
 
-  const LoadingState({super.key, required List<Command> commands, required List<ChangeNotifier> notifiers, required Widget child}) : _commands = commands, _notifiers = notifiers, _child = child;
+  const LoadingState({super.key, required List<Command> commands, required List<ChangeNotifier> notifiers, required Widget Function(BuildContext, Widget?) child}) : _commands = commands, _notifiers = notifiers, _child = child;
 
   
   @override
@@ -24,9 +23,7 @@ final class LoadingState extends StatelessWidget {
         }
         return child!;
       },
-      child: ListenableBuilder(listenable: Listenable.merge(_notifiers), builder: (context, _) {
-        return _child;
-      }),
+      child: ListenableBuilder(listenable: Listenable.merge(_notifiers), builder: _child),
     );
   }
 }

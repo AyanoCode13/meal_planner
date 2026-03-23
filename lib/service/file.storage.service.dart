@@ -5,11 +5,10 @@ import 'package:path_provider/path_provider.dart';
 final class FileStorageService {
   const FileStorageService();
   Future<Directory> _getBaseDir() async {
-    final dir = await getApplicationDocumentsDirectory();
-    return dir;
+    return await getApplicationDocumentsDirectory();
   }
 
-  Future<String> saveFile(File file, String folder) async {
+  Future<String> saveFile({required File file, required String folder}) async {
     final baseDir = await _getBaseDir();
     final targetDir = Directory('${baseDir.path}/$folder');
     if (!await targetDir.exists()) {
@@ -24,7 +23,7 @@ final class FileStorageService {
     return filename;
   }
 
-  Future<File?> getFile(String folder, String fileName) async {
+  Future<File?> getFile({required String folder, required String fileName}) async {
     final baseDir = await _getBaseDir();
     final path = '${baseDir.path}/$folder/$fileName';
     print("File path: $path");
@@ -32,7 +31,7 @@ final class FileStorageService {
     return await file.exists() ? file : null;
   }
 
-  Future<void> deleteFiles(String folder) async {
+  Future<void> deleteFiles({required String folder}) async {
     final baseDir = await _getBaseDir();
     final targetDir = Directory('${baseDir.path}/$folder');
     await targetDir.delete(recursive: true);

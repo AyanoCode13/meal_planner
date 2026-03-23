@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:meal_planner/domain/dto/product/create.product.dto.dart';
+import 'package:meal_planner/ui/shared/image.selector.dart';
 import 'package:meal_planner/ui/viewModels/product.viewModel.dart';
 import 'package:provider/provider.dart';
 
@@ -18,7 +19,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
   final TextFormField _nameFormField = TextFormField(
     decoration: InputDecoration(
       labelText: "Name",
-      border: OutlineInputBorder(),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
     ),
     controller: TextEditingController(),
   );
@@ -26,7 +27,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
   final TextFormField _priceFormField = TextFormField(
     decoration: InputDecoration(
       labelText: "Price",
-      border: OutlineInputBorder(),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
     ),
     keyboardType: TextInputType.numberWithOptions(decimal: true),
     controller: TextEditingController(),
@@ -35,97 +36,104 @@ class _AddProductScreenState extends State<AddProductScreen> {
   final TextFormField _quantityFormField = TextFormField(
     decoration: InputDecoration(
       labelText: "Quantity",
-      border: OutlineInputBorder(),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
     ),
     keyboardType: TextInputType.number,
     controller: TextEditingController(),
   );
 
   final _picker = ImagePicker();
-
   XFile? _image;
+
+  // Future<void> showOptions(BuildContext context) {
+  //   final _picker = ImagePicker();
+  //   return showModalBottomSheet(
+  //     context: context,
+  //     builder: (context) => Column(
+  //       mainAxisSize: MainAxisSize.min,
+  //       children: [
+  //         ListTile(
+  //           leading: Icon(Icons.camera_alt),
+  //           title: Text("Take a photo"),
+  //           onTap: () async {
+  //             final pickedFile = await _picker.pickImage(
+  //               source: ImageSource.camera,
+  //             );
+  //             if (pickedFile != null) {
+  //               setState(() {
+  //                 _image = pickedFile;
+  //                 context.pop();
+  //               });
+  //             }
+  //           },
+  //         ),
+  //         ListTile(
+  //           leading: Icon(Icons.photo_library),
+  //           title: Text("Choose from gallery"),
+  //           onTap: () async {
+  //             final pickedFile = await _picker.pickImage(
+  //               source: ImageSource.gallery,
+  //             );
+  //             if (pickedFile != null) {
+  //               setState(() {
+  //                 _image = pickedFile;
+  //                 context.pop();
+  //               });
+  //             }
+  //           },
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('New Product'),
-        actions: [
-          IconButton(
-            onPressed: () {
-              context.read<ProductViewModel>().add.execute(
-                arg: CreateProductDTO(
-                  name: _nameFormField.controller!.text,
-                  description: "",
-                  price: _priceFormField.controller!.text,
-                  quantity: _quantityFormField.controller!.text,
-                  image: _image,
+    return Material(
+      child: SafeArea(
+        child: CustomScrollView(
+          shrinkWrap: true,
+          slivers: [
+            SliverAppBar(
+              title: Text("New Product"),
+              actions: [
+                IconButton.filled(
+                  onPressed: () {
+                    context.read<ProductViewModel>().add.execute(
+                      arg: CreateProductDTO(
+                        name: _nameFormField.controller?.text ?? "",
+                        price: _priceFormField.controller?.text ?? "0.0",
+                        quantity: _quantityFormField.controller?.text ?? "1",
+                        description: "",
+                        image: _image
+                      ),
+                    );
+                    context.pop();
+                  },
+                  icon: Icon(Icons.save_rounded),
                 ),
-              );
-              context.pop();
-            },
-            icon: Icon(Icons.save),
-          ),
-        ],
-      ),
-      body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Flexible(
-              fit: FlexFit.tight,
+              ],
+            ),
+            SliverToBoxAdapter(
               child: GestureDetector(
                 onTap: () async {
                   //Show a toast with 2 options: "Take a photo" and "Choose from gallery"
-                  showModalBottomSheet(
-                    context: context,
-                    builder: (context) => Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        ListTile(
-                          leading: Icon(Icons.camera_alt),
-                          title: Text("Take a photo"),
-                          onTap: () async {
-                            final pickedFile = await _picker.pickImage(
-                              source: ImageSource.camera,
-                            );
-                            if (pickedFile != null) {
-                              setState(() {
-                                _image = pickedFile;
-                                context.pop();
-                              });
-                            }
-                          },
-                        ),
-                        ListTile(
-                          leading: Icon(Icons.photo_library),
-                          title: Text("Choose from gallery"),
-                          onTap: () async {
-                            final pickedFile = await _picker.pickImage(
-                              source: ImageSource.gallery,
-                            );
-                            if (pickedFile != null) {
-                              setState(() {
-                                _image = pickedFile;
-                                context.pop();
-                              });
-                            }
-                          },
-                        ),
-                      ],
-                    ),
-                  );
+                  showOptions(context: context, setSelectedImage: (image) {
+                    setState(() {
+                      _image = image;
+                    });
+                  },);
                 },
                 child: Container(
                   constraints: BoxConstraints.tight(
-                    MediaQuery.sizeOf(context) * 0.9,
+                    MediaQuery.sizeOf(context) * 0.6,
                   ),
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(15),
+                    shape: BoxShape.circle,
                     image: DecorationImage(
-                      fit: _image != null ? BoxFit.cover : null,
-                      scale: _image != null ? 0.2 : 1.0,
+                      scale: 0.3,
+                      fit: BoxFit.scaleDown,
                       image: _image != null
                           ? FileImage(File(_image!.path))
                           : AssetImage("assets/no_image.png"),
@@ -149,14 +157,24 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Column(
-                spacing: 10,
-                children: [_nameFormField, _priceFormField, _quantityFormField],
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: _nameFormField,
               ),
             ),
-           
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: _priceFormField,
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: _quantityFormField,
+              ),
+            ),
           ],
         ),
       ),

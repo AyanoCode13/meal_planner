@@ -32,7 +32,6 @@ final class _ProductListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       onTap: () {
-        context.read<ProductViewModel>().getById.execute(arg: product.id);
         context.push(ProductRoutes.view(product));
       },
       leading: Text.rich(TextSpan(text: "${product.quantity}x")),

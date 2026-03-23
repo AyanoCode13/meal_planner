@@ -76,6 +76,8 @@ class _$LocalDatabase extends LocalDatabase {
 
   RecipeDAO? _recipeDAOInstance;
 
+  RecipesAndProductsDAO? _recipesAndProductsDaoInstance;
+
   Future<sqflite.Database> open(
     String path,
     List<Migration> migrations, [
@@ -98,9 +100,11 @@ class _$LocalDatabase extends LocalDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `products` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `description` TEXT NOT NULL, `price` REAL NOT NULL, `quantity` INTEGER NOT NULL, `image` TEXT NOT NULL, PRIMARY KEY (`id`))');
+            'CREATE TABLE IF NOT EXISTS `products` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `description` TEXT, `price` REAL NOT NULL, `quantity` INTEGER NOT NULL, `image` TEXT, PRIMARY KEY (`id`))');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `recipes` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `description` TEXT NOT NULL, `price` REAL NOT NULL, `image` TEXT NOT NULL, `preparationTime` TEXT NOT NULL, PRIMARY KEY (`id`))');
+            'CREATE TABLE IF NOT EXISTS `recipes` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `description` TEXT, `image` TEXT, `preparationTime` TEXT NOT NULL, PRIMARY KEY (`id`))');
+        await database.execute(
+            'CREATE TABLE IF NOT EXISTS `recipe_product_join` (`recipeId` TEXT NOT NULL, `productId` TEXT NOT NULL, `quantity` INTEGER NOT NULL, FOREIGN KEY (`recipeId`) REFERENCES `recipes` (`id`) ON UPDATE NO ACTION ON DELETE CASCADE, FOREIGN KEY (`productId`) REFERENCES `products` (`id`) ON UPDATE NO ACTION ON DELETE CASCADE, PRIMARY KEY (`recipeId`, `productId`))');
         await database.execute(
             'CREATE UNIQUE INDEX `index_products_id` ON `products` (`id`)');
         await database.execute(
@@ -109,6 +113,12 @@ class _$LocalDatabase extends LocalDatabase {
             'CREATE UNIQUE INDEX `index_recipes_id` ON `recipes` (`id`)');
         await database.execute(
             'CREATE UNIQUE INDEX `index_recipes_name` ON `recipes` (`name`)');
+        await database.execute(
+            'CREATE INDEX `index_recipe_product_join_recipeId` ON `recipe_product_join` (`recipeId`)');
+        await database.execute(
+            'CREATE INDEX `index_recipe_product_join_productId` ON `recipe_product_join` (`productId`)');
+        await database.execute(
+            'CREATE VIEW IF NOT EXISTS `recipe_view` AS SELECT r.*, COALESCE(SUM(p.price * j.quantity), 0.0) as total FROM recipes r LEFT JOIN recipe_product_join j ON j.recipeId = r.id LEFT JOIN products p ON p.id = j.productId GROUP BY r.id, r.name');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -124,6 +134,12 @@ class _$LocalDatabase extends LocalDatabase {
   @override
   RecipeDAO get recipeDAO {
     return _recipeDAOInstance ??= _$RecipeDAO(database, changeListener);
+  }
+
+  @override
+  RecipesAndProductsDAO get recipesAndProductsDao {
+    return _recipesAndProductsDaoInstance ??=
+        _$RecipesAndProductsDAO(database, changeListener);
   }
 }
 
@@ -172,10 +188,10 @@ class _$ProductDAO extends ProductDAO {
         mapper: (Map<String, Object?> row) => ProductModel(
             id: row['id'] as String,
             name: row['name'] as String,
-            description: row['description'] as String,
+            description: row['description'] as String?,
             price: row['price'] as double,
             quantity: row['quantity'] as int,
-            image: row['image'] as String));
+            image: row['image'] as String?));
   }
 
   @override
@@ -184,10 +200,10 @@ class _$ProductDAO extends ProductDAO {
         mapper: (Map<String, Object?> row) => ProductModel(
             id: row['id'] as String,
             name: row['name'] as String,
-            description: row['description'] as String,
+            description: row['description'] as String?,
             price: row['price'] as double,
             quantity: row['quantity'] as int,
-            image: row['image'] as String),
+            image: row['image'] as String?),
         arguments: [id]);
   }
 
@@ -198,9 +214,23 @@ class _$ProductDAO extends ProductDAO {
   }
 
   @override
+  Future<List<ProductModel>> getProductsForRecipe(String recipeId) async {
+    return _queryAdapter.queryList(
+        'SELECT p.* FROM products p     INNER JOIN recipe_product_join rpj ON p.id = rpj.productId     WHERE rpj.recipeId = ?1',
+        mapper: (Map<String, Object?> row) => ProductModel(id: row['id'] as String, name: row['name'] as String, description: row['description'] as String?, price: row['price'] as double, quantity: row['quantity'] as int, image: row['image'] as String?),
+        arguments: [recipeId]);
+  }
+
+  @override
   Future<void> insert(ProductModel product) async {
     await _productModelInsertionAdapter.insert(
         product, OnConflictStrategy.replace);
+  }
+
+  @override
+  Future<void> insertMany(List<ProductModel> products) async {
+    await _productModelInsertionAdapter.insertList(
+        products, OnConflictStrategy.replace);
   }
 
   @override
@@ -222,7 +252,6 @@ class _$RecipeDAO extends RecipeDAO {
                   'id': item.id,
                   'name': item.name,
                   'description': item.description,
-                  'price': item.price,
                   'image': item.image,
                   'preparationTime': item.preparationTime
                 });
@@ -236,20 +265,96 @@ class _$RecipeDAO extends RecipeDAO {
   final InsertionAdapter<RecipeModel> _recipeModelInsertionAdapter;
 
   @override
-  Future<List<RecipeModel>> getAll() async {
-    return _queryAdapter.queryList('SELECT * FROM recipes',
-        mapper: (Map<String, Object?> row) => RecipeModel(
+  Future<List<Recipe>> getAll() async {
+    return _queryAdapter.queryList('SELECT * FROM recipe_view',
+        mapper: (Map<String, Object?> row) => Recipe(
             id: row['id'] as String,
             name: row['name'] as String,
             description: row['description'] as String,
-            price: row['price'] as double,
-            image: row['image'] as String,
-            preparationTime: row['preparationTime'] as String));
+            total: row['total'] as double?,
+            file: row['file'] as String?));
+  }
+
+  @override
+  Future<RecipeModel?> findById(String id) async {
+    return _queryAdapter.query('SELECT * FROM recipes WHERE id = ?1',
+        mapper: (Map<String, Object?> row) => RecipeModel(
+            id: row['id'] as String,
+            name: row['name'] as String,
+            description: row['description'] as String?,
+            image: row['image'] as String?,
+            preparationTime: row['preparationTime'] as String),
+        arguments: [id]);
+  }
+
+  @override
+  Future<void> delete(String id) async {
+    await _queryAdapter
+        .queryNoReturn('DELETE FROM recipes WHERE id = ?1', arguments: [id]);
+  }
+
+  @override
+  Future<double?> _calculateTotal(String recipeId) async {
+    return _queryAdapter.query(
+        'SELECT COALESCE(SUM(p.price * j.quantity), 0.0)     FROM products p     INNER JOIN recipe_product_join j ON j.product_id = p.id     WHERE j.recipe_id = ?1',
+        mapper: (Map<String, Object?> row) => row.values.first as double,
+        arguments: [recipeId]);
   }
 
   @override
   Future<void> insertRecipe(RecipeModel recipe) async {
     await _recipeModelInsertionAdapter.insert(
         recipe, OnConflictStrategy.replace);
+  }
+
+  @override
+  Future<void> insertMany(List<RecipeModel> recipe) async {
+    await _recipeModelInsertionAdapter.insertList(
+        recipe, OnConflictStrategy.replace);
+  }
+}
+
+class _$RecipesAndProductsDAO extends RecipesAndProductsDAO {
+  _$RecipesAndProductsDAO(
+    this.database,
+    this.changeListener,
+  )   : _queryAdapter = QueryAdapter(database),
+        _recipeProductModelInsertionAdapter = InsertionAdapter(
+            database,
+            'recipe_product_join',
+            (RecipeProductModel item) => <String, Object?>{
+                  'recipeId': item.recipeId,
+                  'productId': item.productId,
+                  'quantity': item.quantity
+                });
+
+  final sqflite.DatabaseExecutor database;
+
+  final StreamController<String> changeListener;
+
+  final QueryAdapter _queryAdapter;
+
+  final InsertionAdapter<RecipeProductModel>
+      _recipeProductModelInsertionAdapter;
+
+  @override
+  Future<List<RecipeProductModel>> findAll() async {
+    return _queryAdapter.queryList('SELECT * FROM recipe_product_join',
+        mapper: (Map<String, Object?> row) => RecipeProductModel(
+            recipeId: row['recipeId'] as String,
+            productId: row['productId'] as String,
+            quantity: row['quantity'] as int));
+  }
+
+  @override
+  Future<void> insert(RecipeProductModel model) async {
+    await _recipeProductModelInsertionAdapter.insert(
+        model, OnConflictStrategy.replace);
+  }
+
+  @override
+  Future<void> insertMany(List<RecipeProductModel> models) async {
+    await _recipeProductModelInsertionAdapter.insertList(
+        models, OnConflictStrategy.replace);
   }
 }

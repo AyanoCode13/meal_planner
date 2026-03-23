@@ -11,6 +11,12 @@ final class GetAllRecipesUseCase extends UseCase<void, List<RecipeEntity>> {
 
   @override
   Future<Result<List<RecipeEntity>>> call({required void input}) async {
-    return await _repository.getAll();
+    try {
+      final res = await _repository.getAll();
+      print(res);
+      return Result.ok(res);
+    } on Exception catch (e) {
+      return Result.error(e);
+    }
   }
 }

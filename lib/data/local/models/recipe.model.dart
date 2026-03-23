@@ -1,8 +1,4 @@
-import 'dart:io';
-
 import 'package:floor/floor.dart';
-import 'package:meal_planner/domain/abstract/model.dart';
-import 'package:meal_planner/domain/entities/recipe/recipe.entity.dart';
 
 
 @Entity(
@@ -16,11 +12,10 @@ import 'package:meal_planner/domain/entities/recipe/recipe.entity.dart';
 final class RecipeModel {
   final String id;
   final String name;
-  final String description;
-  final double price;
-  final String image;
+  final String? description;
+  final String? image;
   final String preparationTime;
 
-  RecipeModel({required this.id, required this.name, required this.description, required this.price, required this.image, required this.preparationTime});
+  RecipeModel({required this.id, required this.name, required this.description,  required this.image, required this.preparationTime});
 
 }

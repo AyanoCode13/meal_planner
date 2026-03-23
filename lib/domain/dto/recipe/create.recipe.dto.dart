@@ -26,6 +26,6 @@ final class CreateRecipeDTO {
       _ingredients.fold(0.0, (sum, ingredient) => sum + ingredient.price);
   File? get image => _image != null ? File(_image.path) : null;
   String get description => _description ?? "";
-  String get ingredients => _ingredients.fold("", (sum, ingredient) => "${ingredient.quantity}x ${ingredient.name}\n");
+  List<ProductEntity> get ingredients =>_ingredients;
   String get preparationTime => _preparationTime.toString();
 }

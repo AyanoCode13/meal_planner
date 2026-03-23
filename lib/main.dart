@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:meal_planner/config/providers/app.providers.dart';
-import 'package:meal_planner/config/routing/router.dart';
 import 'package:provider/provider.dart';
+import 'config/config.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

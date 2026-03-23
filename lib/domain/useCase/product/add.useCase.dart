@@ -12,17 +12,12 @@ final class AddProductUseCase
     : _repository = repository;
   @override
   Future<Result<ProductEntity>> call({required CreateProductDTO input}) async {
-    final product = ProductEntity.create(dto: input);
-
-    final res = await _repository.add(product);
-
-    switch (res) {
-      case Ok<void>():
-        break;
-      case Error<void>():
-        return Result.error(res.error);
+    try {
+      final product = ProductEntity.create(dto: input);
+      final res = await _repository.add(product);
+      return Result.ok(product);
+    } on Exception catch (e) {
+      return Result.error(e);
     }
-    print("Product added: ${product.name}");
-    return Result.ok(product);
   }
 }

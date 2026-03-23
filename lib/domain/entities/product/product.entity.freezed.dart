@@ -19,7 +19,7 @@ mixin _$ProductEntity {
   String get id => throw _privateConstructorUsedError;
   @Assert('name.isNotEmpty', 'name cannot be empty')
   String get name => throw _privateConstructorUsedError;
-  String get description => throw _privateConstructorUsedError;
+  String? get description => throw _privateConstructorUsedError;
   @Assert('price >= 0', 'price cannot be negative')
   double get price => throw _privateConstructorUsedError;
   @Assert('quantity >= 0', 'quantity cannot be negative')
@@ -40,7 +40,7 @@ abstract class $ProductEntityCopyWith<$Res> {
   $Res call(
       {String id,
       @Assert('name.isNotEmpty', 'name cannot be empty') String name,
-      String description,
+      String? description,
       @Assert('price >= 0', 'price cannot be negative') double price,
       @Assert('quantity >= 0', 'quantity cannot be negative') int quantity,
       File? image});
@@ -61,7 +61,7 @@ class _$ProductEntityCopyWithImpl<$Res, $Val extends ProductEntity>
   $Res call({
     Object? id = null,
     Object? name = null,
-    Object? description = null,
+    Object? description = freezed,
     Object? price = null,
     Object? quantity = null,
     Object? image = freezed,
@@ -75,10 +75,10 @@ class _$ProductEntityCopyWithImpl<$Res, $Val extends ProductEntity>
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      description: null == description
+      description: freezed == description
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       price: null == price
           ? _value.price
           : price // ignore: cast_nullable_to_non_nullable
@@ -106,7 +106,7 @@ abstract class _$$ProductEntityImplCopyWith<$Res>
   $Res call(
       {String id,
       @Assert('name.isNotEmpty', 'name cannot be empty') String name,
-      String description,
+      String? description,
       @Assert('price >= 0', 'price cannot be negative') double price,
       @Assert('quantity >= 0', 'quantity cannot be negative') int quantity,
       File? image});
@@ -125,7 +125,7 @@ class __$$ProductEntityImplCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
     Object? name = null,
-    Object? description = null,
+    Object? description = freezed,
     Object? price = null,
     Object? quantity = null,
     Object? image = freezed,
@@ -139,10 +139,10 @@ class __$$ProductEntityImplCopyWithImpl<$Res>
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      description: null == description
+      description: freezed == description
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       price: null == price
           ? _value.price
           : price // ignore: cast_nullable_to_non_nullable
@@ -178,7 +178,7 @@ class _$ProductEntityImpl extends _ProductEntity {
   @Assert('name.isNotEmpty', 'name cannot be empty')
   final String name;
   @override
-  final String description;
+  final String? description;
   @override
   @Assert('price >= 0', 'price cannot be negative')
   final double price;
@@ -224,7 +224,7 @@ abstract class _ProductEntity extends ProductEntity {
       {required final String id,
       @Assert('name.isNotEmpty', 'name cannot be empty')
       required final String name,
-      required final String description,
+      required final String? description,
       @Assert('price >= 0', 'price cannot be negative')
       required final double price,
       @Assert('quantity >= 0', 'quantity cannot be negative')
@@ -238,7 +238,7 @@ abstract class _ProductEntity extends ProductEntity {
   @Assert('name.isNotEmpty', 'name cannot be empty')
   String get name;
   @override
-  String get description;
+  String? get description;
   @override
   @Assert('price >= 0', 'price cannot be negative')
   double get price;

@@ -3,7 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:meal_planner/ui/viewModels/product.viewModel.dart';
+import 'package:meal_planner/ui/shared/loading.dart';
+import '../../../viewModels/view.models.dart';
 import 'package:provider/provider.dart';
 
 final class ViewAndEditProductScreen extends StatefulWidget {
@@ -47,14 +48,65 @@ class _ViewAndEditProductScreenState extends State<ViewAndEditProductScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
+    return Material(
+      child: LoadingState(commands: [context.watch<ProductViewModel>().getById], notifiers: [context.watch<RecipeViewModel>()], child: (context,_){
+        final product = context.watch<ProductViewModel>().product;
+        return SafeArea(
+          child: CustomScrollView(
+            slivers: [
+              SliverAppBar(
+                title: Text(product!.name),
+                actions: [
+                  IconButton(
+                    onPressed: () {
+                      context.read<ProductViewModel>().delete.execute(
+                        arg: product,
+                      );
+                      context.pop();
+                    },
+                    icon: Icon(Icons.delete),
+                  ),
+                  IconButton(onPressed: (){
+                    context.pop();
+                  }, icon: Icon(Icons.save))
+                ],
+              ),
+              SliverToBoxAdapter(
+                child: Container(
+                  constraints: BoxConstraints.tight(MediaQuery.sizeOf(context) * 0.3),
+                  
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    image: DecorationImage(image: product.image!=null ? FileImage(product.image!) : AssetImage("assets/no_image.png"), fit: BoxFit.cover)
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Text(product.name),
+                        ],
+                      )
+                    ],
+                  ),
+                )
+              )
+            ],
+          ),
+        );
+      }),
+    );
+  }
+}
+
+/*
+ListenableBuilder(
       listenable: context.watch<ProductViewModel>().getById,
       builder: (context, child) {
         if (context.watch<ProductViewModel>().getById.running) {
           return Center(child: const CircularProgressIndicator());
         }
         final product = context.watch<ProductViewModel>().product;
-        _nameFormField.controller!.text = product.name;
+        _nameFormField.controller!.text = product!.name;
         _priceFormField.controller!.text = product.price.toString();
         _quantityFormField.controller!.text = product.quantity.toString();
         return child!;
@@ -65,7 +117,7 @@ class _ViewAndEditProductScreenState extends State<ViewAndEditProductScreen> {
           final product = context.watch<ProductViewModel>().product;
           return Scaffold(
             appBar: AppBar(
-              title: Text(product.name),
+              title: Text(product!.name),
               actions: [
                 IconButton(
                   onPressed: () {
@@ -132,10 +184,11 @@ class _ViewAndEditProductScreenState extends State<ViewAndEditProductScreen> {
                       },
                       child: Container(
                         constraints: BoxConstraints.tight(
-                          MediaQuery.sizeOf(context) * 0.9,
+                          MediaQuery.sizeOf(context) * 0.3,
                         ),
                         decoration: BoxDecoration(
                           border: Border.all(color: Colors.grey),
+                          
                           borderRadius: BorderRadius.circular(15),
 
                           image: DecorationImage(
@@ -183,7 +236,4 @@ class _ViewAndEditProductScreenState extends State<ViewAndEditProductScreen> {
           );
         },
       ),
-    );
-  }
-}
-
+    );*/

@@ -1,0 +1,1 @@
+const getAllRecipes = 'SELECT r.*, COALESCE(SUM(p.price * j.quantity), 0.0) as total FROM recipes r LEFT JOIN recipe_product_join j ON j.recipeId = r.id LEFT JOIN products p ON p.id = j.productId GROUP BY r.id, r.name';

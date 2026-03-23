@@ -1,9 +1,9 @@
-import 'package:meal_planner/utils/result.dart';
+
 
 abstract class Repository<T> {
-  Future<Result<void>> add(T input);
-  Future<Result<void>> update(T input);
-  Future<Result<void>> delete(String id);
-  Future<Result<List<T>>> getAll();
-  Future<Result<T>> getById(String id);
+  Future<void> add(T input);
+  Future<void> update(T input);
+  Future<void> delete(String id);
+  Future<List<T>> getAll();
+  Future<T?> getById(String id);
 }

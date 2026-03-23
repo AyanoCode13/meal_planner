@@ -12,6 +12,12 @@ final class GetAllProductsUseCase extends UseCase<void, List<ProductEntity>> {
 
   @override
   Future<Result<List<ProductEntity>>> call({required void input}) async {
-    return await _repository.getAll();
+    try{
+      final res = await _repository.getAll();
+      return Result.ok(res);
+    }on Exception catch (e){
+      return Result.error(e);
+    }
+    
   }
 }

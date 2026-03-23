@@ -6,7 +6,9 @@ import 'package:meal_planner/ui/screens/product/add/screen.dart';
 import 'package:meal_planner/ui/screens/product/all/screen.dart';
 import 'package:meal_planner/ui/screens/product/id/screen.dart';
 import 'package:meal_planner/ui/screens/recipe/add/screen.dart';
+import 'package:meal_planner/ui/screens/recipe/id/screen.dart';
 import 'package:meal_planner/ui/viewModels/product.viewModel.dart';
+import 'package:meal_planner/ui/viewModels/recipe.viewModel.dart';
 import 'package:provider/provider.dart';
 
 
@@ -39,6 +41,13 @@ final List<GoRoute> _recipeRoutes = [
   GoRoute(
     path: RecipeRoutes.add,
     builder: (context, state) => AddRecipeScreen(),
+  ),
+  GoRoute(
+    path: "/recipes/:id",
+    builder: (context, state) {final id = state.pathParameters["id"];
+      context.read<RecipeViewModel>().getById.execute(arg: id!);
+      return RecipesViewScreen();
+    } ,
   )
 ];
 

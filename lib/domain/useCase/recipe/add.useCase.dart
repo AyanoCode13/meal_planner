@@ -15,12 +15,11 @@ final class AddRecipeUseCase extends UseCase<CreateRecipeDTO, void> {
   Future<Result<RecipeEntity>> call({required CreateRecipeDTO input}) async {
     // TODO: implement call
     final recipe = RecipeEntity.create(dto: input);
-    final res = await _repository.add(recipe);
-    switch (res) {
-      case Ok<void>():
-        return Result.ok(recipe);
-      case Error<void>():
-        return Result.error(res.error);
+    try {
+      await _repository.add(recipe);
+      return Result.ok(recipe);
+    } on Exception catch (e) {
+      return Result.error(e);
     }
   }
 }
