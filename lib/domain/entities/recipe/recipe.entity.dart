@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:meal_planner/data/views/views.dart';
 import 'package:meal_planner/domain/dto/recipe/create.recipe.dto.dart';
 import 'package:meal_planner/domain/entities/product/product.entity.dart';
 import 'package:uuid/uuid.dart';
@@ -9,7 +10,6 @@ part 'recipe.entity.freezed.dart';
 
 @freezed
 abstract class RecipeEntity with _$RecipeEntity {
-  const RecipeEntity._();
   const factory RecipeEntity({
     required String id,
     required String name,
@@ -17,7 +17,7 @@ abstract class RecipeEntity with _$RecipeEntity {
     required String preparationTime,
     required String? description,
     required List<ProductEntity> ingredients,
-    required File? image,
+    required List<File?> images,
   }) = _RecipeEntity;
 
   factory RecipeEntity.create({ required CreateRecipeDTO dto}) => RecipeEntity(
@@ -27,10 +27,18 @@ abstract class RecipeEntity with _$RecipeEntity {
     preparationTime: dto.preparationTime,
     description: dto.description,
     ingredients: dto.ingredients,
-    image: dto.image,
+    images: dto.images,
   );
   
-  
+  factory RecipeEntity.fromView({ required RecipeView data, required List<File?> images}) => RecipeEntity(
+    id: data.id,
+    name: data.name,
+    price: data.total ?? 0.0,
+    preparationTime: data.preparationTime.toString(),
+    description: data.description,
+    ingredients: [],
+    images:images,
+  );
 
 
 }

@@ -90,7 +90,14 @@ class _AddProductScreenState extends State<AddProductScreen> {
   @override
   Widget build(BuildContext context) {
     return Material(
-      child: SafeArea(
+     child: Center(
+      child: Text("Work In Progress"),
+     ),
+    );
+  }
+}
+/*
+ child: SafeArea(
         child: CustomScrollView(
           shrinkWrap: true,
           slivers: [
@@ -177,7 +184,4 @@ class _AddProductScreenState extends State<AddProductScreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
+      ),*/

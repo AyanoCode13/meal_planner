@@ -50,7 +50,7 @@ class _ViewAndEditProductScreenState extends State<ViewAndEditProductScreen> {
   Widget build(BuildContext context) {
     return Material(
       child: LoadingState(commands: [context.watch<ProductViewModel>().getById], notifiers: [context.watch<RecipeViewModel>()], child: (context,_){
-        final product = context.watch<ProductViewModel>().product;
+        final product = context.watch<ProductViewModel>().selected;
         return SafeArea(
           child: CustomScrollView(
             slivers: [
@@ -77,7 +77,7 @@ class _ViewAndEditProductScreenState extends State<ViewAndEditProductScreen> {
                   
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
-                    image: DecorationImage(image: product.image!=null ? FileImage(product.image!) : AssetImage("assets/no_image.png"), fit: BoxFit.cover)
+                    image: DecorationImage(image: product.images.isNotEmpty ? FileImage(product.images[0]!) : AssetImage("assets/no_image.png"), fit: BoxFit.cover)
                   ),
                   child: Column(
                     children: [

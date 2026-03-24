@@ -27,7 +27,7 @@ import 'package:meal_planner/data/local/models/recipe.model.dart';
     Index(value: ['productId']),
   ],
 )
-final class RecipeProductModel {
+class RecipeProductModel {
  
   final String recipeId;
   final String productId;

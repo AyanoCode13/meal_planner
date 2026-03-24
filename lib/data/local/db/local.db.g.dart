@@ -76,7 +76,9 @@ class _$LocalDatabase extends LocalDatabase {
 
   RecipeDAO? _recipeDAOInstance;
 
-  RecipesAndProductsDAO? _recipesAndProductsDaoInstance;
+  ImageDAO? _imageDAOInstance;
+
+  RecipesAndProductsDAO? _recipesAndProductsDAOInstance;
 
   Future<sqflite.Database> open(
     String path,
@@ -100,9 +102,11 @@ class _$LocalDatabase extends LocalDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `products` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `description` TEXT, `price` REAL NOT NULL, `quantity` INTEGER NOT NULL, `image` TEXT, PRIMARY KEY (`id`))');
+            'CREATE TABLE IF NOT EXISTS `products` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `description` TEXT, `price` REAL NOT NULL, `quantity` INTEGER NOT NULL, PRIMARY KEY (`id`))');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `recipes` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `description` TEXT, `image` TEXT, `preparationTime` TEXT NOT NULL, PRIMARY KEY (`id`))');
+            'CREATE TABLE IF NOT EXISTS `recipes` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `description` TEXT, `preparationTime` INTEGER NOT NULL, `createdAt` TEXT NOT NULL, `updatedAt` TEXT NOT NULL, PRIMARY KEY (`id`))');
+        await database.execute(
+            'CREATE TABLE IF NOT EXISTS `images` (`id` TEXT NOT NULL, `url` TEXT NOT NULL, `isThumbnail` INTEGER NOT NULL, PRIMARY KEY (`id`, `url`))');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `recipe_product_join` (`recipeId` TEXT NOT NULL, `productId` TEXT NOT NULL, `quantity` INTEGER NOT NULL, FOREIGN KEY (`recipeId`) REFERENCES `recipes` (`id`) ON UPDATE NO ACTION ON DELETE CASCADE, FOREIGN KEY (`productId`) REFERENCES `products` (`id`) ON UPDATE NO ACTION ON DELETE CASCADE, PRIMARY KEY (`recipeId`, `productId`))');
         await database.execute(
@@ -137,8 +141,13 @@ class _$LocalDatabase extends LocalDatabase {
   }
 
   @override
-  RecipesAndProductsDAO get recipesAndProductsDao {
-    return _recipesAndProductsDaoInstance ??=
+  ImageDAO get imageDAO {
+    return _imageDAOInstance ??= _$ImageDAO(database, changeListener);
+  }
+
+  @override
+  RecipesAndProductsDAO get recipesAndProductsDAO {
+    return _recipesAndProductsDAOInstance ??=
         _$RecipesAndProductsDAO(database, changeListener);
   }
 }
@@ -156,8 +165,7 @@ class _$ProductDAO extends ProductDAO {
                   'name': item.name,
                   'description': item.description,
                   'price': item.price,
-                  'quantity': item.quantity,
-                  'image': item.image
+                  'quantity': item.quantity
                 }),
         _productModelUpdateAdapter = UpdateAdapter(
             database,
@@ -168,8 +176,18 @@ class _$ProductDAO extends ProductDAO {
                   'name': item.name,
                   'description': item.description,
                   'price': item.price,
-                  'quantity': item.quantity,
-                  'image': item.image
+                  'quantity': item.quantity
+                }),
+        _productModelDeletionAdapter = DeletionAdapter(
+            database,
+            'products',
+            ['id'],
+            (ProductModel item) => <String, Object?>{
+                  'id': item.id,
+                  'name': item.name,
+                  'description': item.description,
+                  'price': item.price,
+                  'quantity': item.quantity
                 });
 
   final sqflite.DatabaseExecutor database;
@@ -182,6 +200,8 @@ class _$ProductDAO extends ProductDAO {
 
   final UpdateAdapter<ProductModel> _productModelUpdateAdapter;
 
+  final DeletionAdapter<ProductModel> _productModelDeletionAdapter;
+
   @override
   Future<List<ProductModel>> findAll() async {
     return _queryAdapter.queryList('SELECT * FROM products',
@@ -190,8 +210,7 @@ class _$ProductDAO extends ProductDAO {
             name: row['name'] as String,
             description: row['description'] as String?,
             price: row['price'] as double,
-            quantity: row['quantity'] as int,
-            image: row['image'] as String?));
+            quantity: row['quantity'] as int));
   }
 
   @override
@@ -202,41 +221,41 @@ class _$ProductDAO extends ProductDAO {
             name: row['name'] as String,
             description: row['description'] as String?,
             price: row['price'] as double,
-            quantity: row['quantity'] as int,
-            image: row['image'] as String?),
+            quantity: row['quantity'] as int),
         arguments: [id]);
   }
 
   @override
-  Future<void> delete(String id) async {
-    await _queryAdapter
-        .queryNoReturn('DELETE FROM products WHERE id = ?1', arguments: [id]);
-  }
-
-  @override
-  Future<List<ProductModel>> getProductsForRecipe(String recipeId) async {
-    return _queryAdapter.queryList(
-        'SELECT p.* FROM products p     INNER JOIN recipe_product_join rpj ON p.id = rpj.productId     WHERE rpj.recipeId = ?1',
-        mapper: (Map<String, Object?> row) => ProductModel(id: row['id'] as String, name: row['name'] as String, description: row['description'] as String?, price: row['price'] as double, quantity: row['quantity'] as int, image: row['image'] as String?),
-        arguments: [recipeId]);
-  }
-
-  @override
-  Future<void> insert(ProductModel product) async {
+  Future<void> insert(ProductModel data) async {
     await _productModelInsertionAdapter.insert(
-        product, OnConflictStrategy.replace);
+        data, OnConflictStrategy.replace);
   }
 
   @override
-  Future<void> insertMany(List<ProductModel> products) async {
+  Future<void> insertAll(List<ProductModel> data) async {
     await _productModelInsertionAdapter.insertList(
-        products, OnConflictStrategy.replace);
+        data, OnConflictStrategy.replace);
   }
 
   @override
-  Future<void> update(ProductModel product) async {
-    await _productModelUpdateAdapter.update(
-        product, OnConflictStrategy.replace);
+  Future<void> update(ProductModel data) async {
+    await _productModelUpdateAdapter.update(data, OnConflictStrategy.replace);
+  }
+
+  @override
+  Future<void> updateAll(List<ProductModel> data) async {
+    await _productModelUpdateAdapter.updateList(
+        data, OnConflictStrategy.replace);
+  }
+
+  @override
+  Future<void> removeAll(List<ProductModel> data) async {
+    await _productModelDeletionAdapter.deleteList(data);
+  }
+
+  @override
+  Future<void> remove(ProductModel data) async {
+    await _productModelDeletionAdapter.delete(data);
   }
 }
 
@@ -252,8 +271,36 @@ class _$RecipeDAO extends RecipeDAO {
                   'id': item.id,
                   'name': item.name,
                   'description': item.description,
-                  'image': item.image,
-                  'preparationTime': item.preparationTime
+                  'preparationTime':
+                      _durationConverter.encode(item.preparationTime),
+                  'createdAt': _dateTimeConverter.encode(item.createdAt),
+                  'updatedAt': _dateTimeConverter.encode(item.updatedAt)
+                }),
+        _recipeModelUpdateAdapter = UpdateAdapter(
+            database,
+            'recipes',
+            ['id'],
+            (RecipeModel item) => <String, Object?>{
+                  'id': item.id,
+                  'name': item.name,
+                  'description': item.description,
+                  'preparationTime':
+                      _durationConverter.encode(item.preparationTime),
+                  'createdAt': _dateTimeConverter.encode(item.createdAt),
+                  'updatedAt': _dateTimeConverter.encode(item.updatedAt)
+                }),
+        _recipeModelDeletionAdapter = DeletionAdapter(
+            database,
+            'recipes',
+            ['id'],
+            (RecipeModel item) => <String, Object?>{
+                  'id': item.id,
+                  'name': item.name,
+                  'description': item.description,
+                  'preparationTime':
+                      _durationConverter.encode(item.preparationTime),
+                  'createdAt': _dateTimeConverter.encode(item.createdAt),
+                  'updatedAt': _dateTimeConverter.encode(item.updatedAt)
                 });
 
   final sqflite.DatabaseExecutor database;
@@ -264,53 +311,124 @@ class _$RecipeDAO extends RecipeDAO {
 
   final InsertionAdapter<RecipeModel> _recipeModelInsertionAdapter;
 
+  final UpdateAdapter<RecipeModel> _recipeModelUpdateAdapter;
+
+  final DeletionAdapter<RecipeModel> _recipeModelDeletionAdapter;
+
   @override
-  Future<List<Recipe>> getAll() async {
+  Future<List<RecipeView>> findAll() async {
     return _queryAdapter.queryList('SELECT * FROM recipe_view',
-        mapper: (Map<String, Object?> row) => Recipe(
+        mapper: (Map<String, Object?> row) => RecipeView(
             id: row['id'] as String,
             name: row['name'] as String,
             description: row['description'] as String,
             total: row['total'] as double?,
-            file: row['file'] as String?));
+            file: row['file'] as String?,
+            preparationTime: row['preparationTime'] as int));
   }
 
   @override
-  Future<RecipeModel?> findById(String id) async {
-    return _queryAdapter.query('SELECT * FROM recipes WHERE id = ?1',
-        mapper: (Map<String, Object?> row) => RecipeModel(
+  Future<RecipeView?> findById(String id) async {
+    return _queryAdapter.query('SELECT * FROM recipe_view WHERE id = ?1',
+        mapper: (Map<String, Object?> row) => RecipeView(
             id: row['id'] as String,
             name: row['name'] as String,
-            description: row['description'] as String?,
-            image: row['image'] as String?,
-            preparationTime: row['preparationTime'] as String),
+            description: row['description'] as String,
+            total: row['total'] as double?,
+            file: row['file'] as String?,
+            preparationTime: row['preparationTime'] as int),
         arguments: [id]);
   }
 
   @override
-  Future<void> delete(String id) async {
-    await _queryAdapter
-        .queryNoReturn('DELETE FROM recipes WHERE id = ?1', arguments: [id]);
+  Future<void> insert(RecipeModel data) async {
+    await _recipeModelInsertionAdapter.insert(data, OnConflictStrategy.replace);
   }
 
   @override
-  Future<double?> _calculateTotal(String recipeId) async {
-    return _queryAdapter.query(
-        'SELECT COALESCE(SUM(p.price * j.quantity), 0.0)     FROM products p     INNER JOIN recipe_product_join j ON j.product_id = p.id     WHERE j.recipe_id = ?1',
-        mapper: (Map<String, Object?> row) => row.values.first as double,
-        arguments: [recipeId]);
-  }
-
-  @override
-  Future<void> insertRecipe(RecipeModel recipe) async {
-    await _recipeModelInsertionAdapter.insert(
-        recipe, OnConflictStrategy.replace);
-  }
-
-  @override
-  Future<void> insertMany(List<RecipeModel> recipe) async {
+  Future<void> insertAll(List<RecipeModel> data) async {
     await _recipeModelInsertionAdapter.insertList(
-        recipe, OnConflictStrategy.replace);
+        data, OnConflictStrategy.replace);
+  }
+
+  @override
+  Future<void> update(RecipeModel data) async {
+    await _recipeModelUpdateAdapter.update(data, OnConflictStrategy.replace);
+  }
+
+  @override
+  Future<void> updateAll(List<RecipeModel> data) async {
+    await _recipeModelUpdateAdapter.updateList(
+        data, OnConflictStrategy.replace);
+  }
+
+  @override
+  Future<void> removeAll(List<RecipeModel> data) async {
+    await _recipeModelDeletionAdapter.deleteList(data);
+  }
+
+  @override
+  Future<void> remove(RecipeModel id) async {
+    await _recipeModelDeletionAdapter.delete(id);
+  }
+}
+
+class _$ImageDAO extends ImageDAO {
+  _$ImageDAO(
+    this.database,
+    this.changeListener,
+  )   : _queryAdapter = QueryAdapter(database),
+        _imageModelInsertionAdapter = InsertionAdapter(
+            database,
+            'images',
+            (ImageModel item) => <String, Object?>{
+                  'id': item.id,
+                  'url': item.url,
+                  'isThumbnail': item.isThumbnail ? 1 : 0
+                });
+
+  final sqflite.DatabaseExecutor database;
+
+  final StreamController<String> changeListener;
+
+  final QueryAdapter _queryAdapter;
+
+  final InsertionAdapter<ImageModel> _imageModelInsertionAdapter;
+
+  @override
+  Future<List<ImageModel>> findAll() async {
+    return _queryAdapter.queryList('SELECT * FROM images',
+        mapper: (Map<String, Object?> row) => ImageModel(
+            id: row['id'] as String,
+            url: row['url'] as String,
+            isThumbnail: (row['isThumbnail'] as int) != 0));
+  }
+
+  @override
+  Future<List<ImageModel>> findByOwner(String ownerId) async {
+    return _queryAdapter.queryList('SELECT * FROM images WHERE id = ?1',
+        mapper: (Map<String, Object?> row) => ImageModel(
+            id: row['id'] as String,
+            url: row['url'] as String,
+            isThumbnail: (row['isThumbnail'] as int) != 0),
+        arguments: [ownerId]);
+  }
+
+  @override
+  Future<void> deleteFromOwner(String ownerId) async {
+    await _queryAdapter.queryNoReturn('DELETE * FROM images WHERE id = ?1',
+        arguments: [ownerId]);
+  }
+
+  @override
+  Future<void> insert(ImageModel data) async {
+    await _imageModelInsertionAdapter.insert(data, OnConflictStrategy.replace);
+  }
+
+  @override
+  Future<void> insertAll(List<ImageModel> data) async {
+    await _imageModelInsertionAdapter.insertList(
+        data, OnConflictStrategy.replace);
   }
 }
 
@@ -318,8 +436,7 @@ class _$RecipesAndProductsDAO extends RecipesAndProductsDAO {
   _$RecipesAndProductsDAO(
     this.database,
     this.changeListener,
-  )   : _queryAdapter = QueryAdapter(database),
-        _recipeProductModelInsertionAdapter = InsertionAdapter(
+  ) : _recipeProductModelInsertionAdapter = InsertionAdapter(
             database,
             'recipe_product_join',
             (RecipeProductModel item) => <String, Object?>{
@@ -332,29 +449,22 @@ class _$RecipesAndProductsDAO extends RecipesAndProductsDAO {
 
   final StreamController<String> changeListener;
 
-  final QueryAdapter _queryAdapter;
-
   final InsertionAdapter<RecipeProductModel>
       _recipeProductModelInsertionAdapter;
 
   @override
-  Future<List<RecipeProductModel>> findAll() async {
-    return _queryAdapter.queryList('SELECT * FROM recipe_product_join',
-        mapper: (Map<String, Object?> row) => RecipeProductModel(
-            recipeId: row['recipeId'] as String,
-            productId: row['productId'] as String,
-            quantity: row['quantity'] as int));
-  }
-
-  @override
-  Future<void> insert(RecipeProductModel model) async {
+  Future<void> insert(RecipeProductModel data) async {
     await _recipeProductModelInsertionAdapter.insert(
-        model, OnConflictStrategy.replace);
+        data, OnConflictStrategy.replace);
   }
 
   @override
-  Future<void> insertMany(List<RecipeProductModel> models) async {
+  Future<void> insertAll(List<RecipeProductModel> data) async {
     await _recipeProductModelInsertionAdapter.insertList(
-        models, OnConflictStrategy.replace);
+        data, OnConflictStrategy.replace);
   }
 }
+
+// ignore_for_file: unused_element
+final _dateTimeConverter = DateTimeConverter();
+final _durationConverter = DurationConverter();

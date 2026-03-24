@@ -10,7 +10,7 @@ final class RecipeList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final recipes = context.watch<RecipeViewModel>().recipes;
+    final recipes = context.watch<RecipeViewModel>().data;
     return SliverList.builder(
       itemCount: recipes.length,
       itemBuilder: (context, index) => Padding(
@@ -43,8 +43,8 @@ final class _RecipeListItem extends StatelessWidget {
               Colors.black.withValues(alpha: 0.4),
               BlendMode.darken,
             ),
-            image: _recipe.image != null
-                ? FileImage(_recipe.image!)
+            image: _recipe.images[0] != null
+                ? FileImage(_recipe.images[0]!)
                 : AssetImage("assets/no_image.png"),
           ),
         ),

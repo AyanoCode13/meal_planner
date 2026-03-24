@@ -13,7 +13,7 @@ final class ProductsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final products = context.watch<ProductViewModel>().products;
+    final products = context.watch<ProductViewModel>().data;
     return SliverList.builder(
       itemCount: products.length,
       itemBuilder: (context, index) => Padding(

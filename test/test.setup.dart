@@ -2,7 +2,8 @@
 import 'package:floor/floor.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:meal_planner/data/local/db/local.db.dart';
-import 'package:meal_planner/data/triggers/recipe.triggers.dart';
+import 'package:meal_planner/data/sql/recipe.sql.dart';
+
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 // your other imports...
 

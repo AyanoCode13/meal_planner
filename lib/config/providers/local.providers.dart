@@ -9,62 +9,79 @@ import '../../service/service.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 
-
 Future<List<SingleChildWidget>> get localProviders async {
   await LocalDatabase.initialize();
+  final fileStorageService = FileStorageService();
+  final productDAO = LocalDatabase.instance.productDAO;
+  final recipeDAO = LocalDatabase.instance.recipeDAO;
+  final recipesAndProductsDAO = LocalDatabase.instance.recipesAndProductsDAO;
+  final imageDAO = LocalDatabase.instance.imageDAO;
+
   // Product Providers
   final LocalProductRepository localProductRepository = LocalProductRepository(
-    productDAO: LocalDatabase.instance.productDAO,
-    fileStorageService: FileStorageService(),
+    productDAO: productDAO,
+    imageDAO: imageDAO,
+    fileStorageService: fileStorageService,
   );
-  final AddProductUseCase addProductUseCase = AddProductUseCase(
+  final getAllProductsUseCase = GetAllProductsUseCase(
     repository: localProductRepository as Repository<ProductEntity>,
   );
-  final GetAllProductsUseCase getAllProductsUseCase = GetAllProductsUseCase(
+  final getProductByIdUseCase = GetProductByIdUseCase(
     repository: localProductRepository as Repository<ProductEntity>,
   );
-  final DeleteProductUseCase deleteProductUseCase = DeleteProductUseCase(
+  final addProductUseCase = AddProductUseCase(
     repository: localProductRepository as Repository<ProductEntity>,
   );
-  final GetByIdUseCase getByIdUseCase = GetByIdUseCase(
+  final updateProductUseCase = UpdateProductUseCase(
+    repository: localProductRepository as Repository<ProductEntity>,
+  );
+
+  final deleteProductUseCase = DeleteProductUseCase(
     repository: localProductRepository as Repository<ProductEntity>,
   );
 
   // Recipe Providers
   final LocalRecipeRepository localRecipeRepsitory = LocalRecipeRepository(
-    recipeDAO: LocalDatabase.instance.recipeDAO,
-    productDAO: LocalDatabase.instance.productDAO,
-    recipesAndProductsDAO: LocalDatabase.instance.recipesAndProductsDao,
-    fileStorageService: FileStorageService(),
+    recipeDAO: recipeDAO,
+    imageDAO: imageDAO,
+    recipesAndProductsDAO: recipesAndProductsDAO,
+    fileStorageService: fileStorageService,
   );
-  final AddRecipeUseCase addRecipeUseCase = AddRecipeUseCase(
+  final getAllRecipesUseCase = GetAllRecipesUseCase(
     repository: localRecipeRepsitory as Repository<RecipeEntity>,
   );
-  final GetAllRecipesUseCase getAllRecipesUseCase = GetAllRecipesUseCase(
+  final getRecipeByIdUseCase = GetRecipeByIdUseCase(
+    repository: localRecipeRepsitory,
+  );
+  final addRecipeUseCase = AddRecipeUseCase(
     repository: localRecipeRepsitory as Repository<RecipeEntity>,
   );
-  final GetRecipeByIdUseCase getRecipeByIdUseCase = GetRecipeByIdUseCase(
-    recipeRepsitory: localRecipeRepsitory,
-    productRepository: localProductRepository
+  final updateRecipeUseCase = UpdateRecipeUseCase(
+    repository: localRecipeRepsitory as Repository<RecipeEntity>,
+  );
+  final deleteRecipeUseCase = DeleteRecipeUseCase(
+    repository: localRecipeRepsitory as Repository<RecipeEntity>,
   );
 
-  
   return [
     ChangeNotifierProvider(
       create: (context) => ProductViewModel(
-        addProductUseCase: addProductUseCase,
-        getAllProductsUseCase: getAllProductsUseCase,
-        deleteProductUseCase: deleteProductUseCase,
-        getByIdUseCase: getByIdUseCase,
+        getAllUseCase: getAllProductsUseCase,
+        getByIdUseCase: getProductByIdUseCase,
+        addUseCase: addProductUseCase,
+        updateUseCase: updateProductUseCase,
+        deleteUseCase: deleteProductUseCase,
       ),
     ),
+
     ChangeNotifierProvider(
       create: (context) => RecipeViewModel(
-        addRecipeUseCase: addRecipeUseCase,
-        getAllRecipesUseCase: getAllRecipesUseCase,
-        getRecipeByIdUseCase: getRecipeByIdUseCase
+        getAllUseCase: getAllRecipesUseCase,
+        getByIdUseCase: getRecipeByIdUseCase,
+        addUseCase: addRecipeUseCase,
+        updateUseCase: updateRecipeUseCase,
+        deleteUseCase: deleteRecipeUseCase,
       ),
     ),
   ];
-  
 }

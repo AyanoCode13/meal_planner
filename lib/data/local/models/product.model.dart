@@ -1,4 +1,5 @@
 import 'package:floor/floor.dart';
+import 'package:meal_planner/domain/domain.dart';
 
 
 @Entity(
@@ -9,15 +10,19 @@ import 'package:floor/floor.dart';
     Index(value: ['name'], unique: true),
   ],
 )
-final class ProductModel {
+class ProductModel {
   final String id;
   final String name;
   final String? description;
   final double price;
   final int quantity;
-  final String? image;
 
-  const ProductModel({required this.id, required this.name, required this.description, required this.price, required this.quantity, required this.image});
+
+  const ProductModel({required this.id, required this.name, required this.description, required this.price, required this.quantity});
+  
+  factory ProductModel.fromEntity({ required ProductEntity data}){
+    return ProductModel(id: data.id, name: data.name, description: data.description, price: data.price, quantity: data.quantity);
+  }
 
   
 }

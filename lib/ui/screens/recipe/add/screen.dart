@@ -64,230 +64,235 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final products = context.watch<ProductViewModel>().products;
+    final products = context.watch<ProductViewModel>().selected;
     return Material(
-      child: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            SliverAppBar(
-              title: Text.rich(TextSpan(text: "New Recipe")),
-              actions: [
-                IconButton(
-                  onPressed: () {
-                    context.read<RecipeViewModel>().add.execute(
-                      arg: CreateRecipeDTO(
-                        name: _nameFormField.controller!.text,
-                        ingredients: _ingredients.toSet().toList(),
-                        image: _image,
-                      ),
-                    );
-                    context.pop();
-                  },
-                  icon: Icon(Icons.save),
-                ),
-              ],
-            ),
-            SliverToBoxAdapter(
-              child: ElevatedButton(
-                onPressed: () {
-                  showOptions(
-                    context: context,
-                    setSelectedImage: (image) {
-                      setState(() {
-                        _image = image;
-                      });
-                    },
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  fixedSize: MediaQuery.sizeOf(context) / 9,
-                  shape: CircleBorder(),
-                ),
-                child: Icon(Icons.camera_alt, size: 32),
-              ),
-            ),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: SizedBox(
-                  width: MediaQuery.widthOf(context) * 0.7,
-                  child: _nameFormField,
-                ),
-              ),
-            ),
-
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: SizedBox(
-                  width: MediaQuery.widthOf(context) * 0.7,
-                  child: _descriptionFormField,
-                ),
-              ),
-            ),
-            SliverToBoxAdapter(
-              child: products.isEmpty
-                  ? Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Text("Empty storage"),
-                        ElevatedButton.icon(
-                          label: Text.rich(TextSpan(text: "Add Products")),
-                          onPressed: () {
-                            context.push(ProductRoutes.add);
-                          },
-                          icon: Icon(Icons.add),
-                        ),
-                      ],
-                    )
-                  : Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Expanded(
-                          child: DropdownMenu(
-                            initialSelection: _selectedProduct,
-                            controller: _productController,
-
-                            helperText: "Ingredient",
-
-                            enableFilter: true,
-                            enableSearch: true,
-                            menuStyle: MenuStyle(
-                              shape: WidgetStatePropertyAll(
-                                RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                  side: BorderSide(
-                                    color: Colors.blue,
-                                    width: 2,
-                                  ),
-                                ),
-                              ),
-                            ),
-
-                            dropdownMenuEntries: products
-                                .map(
-                                  (p) => DropdownMenuEntry<ProductEntity>(
-                                    value: p,
-                                    label: p.name,
-                                  ),
-                                )
-                                .toList(),
-                            onSelected: (value) {
-                              if (value != null) {
-                                setState(() {
-                                  _selectedProduct = value;
-                                });
-                              }
-                            },
-                          ),
-                        ),
-                        Flexible(
-                          child: DropdownMenu(
-                            controller: _quantityController,
-                            initialSelection: _selectedQuantity,
-                            helperText: "Quantity",
-                            enableFilter: true,
-                            enableSearch: true,
-                            menuStyle: MenuStyle(
-                              shape: WidgetStatePropertyAll(
-                                RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                  side: BorderSide(
-                                    color: Colors.blue,
-                                    width: 2,
-                                  ),
-                                ),
-                              ),
-                            ),
-
-                            dropdownMenuEntries:
-                                List.generate(9, (int index) => index + 1)
-                                    .map(
-                                      (i) => DropdownMenuEntry<int>(
-                                        value: i,
-                                        label: i.toString(),
-                                      ),
-                                    )
-                                    .toList(),
-
-                            onSelected: (value) {
-                              setState(() {
-                                _selectedQuantity = value ?? 0;
-                              });
-                            },
-                          ),
-                        ),
-                        Flexible(
-                          child: IconButton.filled(
-                            onPressed: () {
-                              if (_selectedProduct != null) {
-                                final duplicateId = _ingredients.indexWhere(
-                                  (e) => e.name == _selectedProduct!.name,
-                                );
-
-                                if (duplicateId != -1) {
-                                  setState(() {
-                                    _ingredients[duplicateId] =
-                                        _ingredients[duplicateId].copyWith(
-                                          quantity: _selectedQuantity ?? 0,
-                                        );
-                                  });
-                                } else {
-                                  setState(() {
-                                    _ingredients.add(
-                                      _selectedProduct!.copyWith(
-                                        quantity: _selectedQuantity ?? 0,
-                                      ),
-                                    );
-                                  });
-                                }
-                                setState(() {
-                                  _total = _ingredients.fold(0.0, (value, e) {
-                                    return value + e.price * e.quantity;
-                                  });
-                                });
-
-                                _productController.clear();
-                                _quantityController.clear();
-                                return;
-                              }
-                            },
-                            icon: Icon(Icons.add),
-                          ),
-                        ),
-                      ],
-                    ),
-            ),
-            SliverToBoxAdapter(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [Text("Total: "), Text(_total.toStringAsFixed(2))],
-              ),
-            ),
-            SliverList.builder(
-              itemCount: _ingredients.length,
-              itemBuilder: (context, index) {
-                final ingredient = _ingredients.elementAt(index);
-                return ListTile(
-                  leading: ingredient.image != null
-                      ? Image.file(ingredient.image!)
-                      : Image.asset("assets/no_image.png"),
-                  subtitle: Text("${ingredient.quantity}x ${ingredient.price}"),
-                  title: Text(ingredient.name),
-                  trailing: IconButton.filled(
-                    onPressed: () {
-                      setState(() {
-                        _ingredients.removeAt(index);
-                      });
-                    },
-                    icon: Icon(Icons.delete),
-                  ),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
+     child: Center(
+      child: Text("Work In Progress"),
+     ),
     );
+    // return Material(
+    //   child: SafeArea(
+    //     child: CustomScrollView(
+    //       slivers: [
+    //         SliverAppBar(
+    //           title: Text.rich(TextSpan(text: "New Recipe")),
+    //           actions: [
+    //             IconButton(
+    //               onPressed: () {
+    //                 context.read<RecipeViewModel>().add.execute(
+    //                   arg: CreateRecipeDTO(
+    //                     name: _nameFormField.controller!.text,
+    //                     ingredients: _ingredients.toSet().toList(),
+    //                     images: [_image],
+    //                   ),
+    //                 );
+    //                 context.pop();
+    //               },
+    //               icon: Icon(Icons.save),
+    //             ),
+    //           ],
+    //         ),
+    //         SliverToBoxAdapter(
+    //           child: ElevatedButton(
+    //             onPressed: () {
+    //               showOptions(
+    //                 context: context,
+    //                 setSelectedImage: (image) {
+    //                   setState(() {
+    //                     _image = image;
+    //                   });
+    //                 },
+    //               );
+    //             },
+    //             style: ElevatedButton.styleFrom(
+    //               fixedSize: MediaQuery.sizeOf(context) / 9,
+    //               shape: CircleBorder(),
+    //             ),
+    //             child: Icon(Icons.camera_alt, size: 32),
+    //           ),
+    //         ),
+    //         SliverToBoxAdapter(
+    //           child: Padding(
+    //             padding: const EdgeInsets.all(10.0),
+    //             child: SizedBox(
+    //               width: MediaQuery.widthOf(context) * 0.7,
+    //               child: _nameFormField,
+    //             ),
+    //           ),
+    //         ),
+
+    //         SliverToBoxAdapter(
+    //           child: Padding(
+    //             padding: const EdgeInsets.all(10.0),
+    //             child: SizedBox(
+    //               width: MediaQuery.widthOf(context) * 0.7,
+    //               child: _descriptionFormField,
+    //             ),
+    //           ),
+    //         ),
+    //         SliverToBoxAdapter(
+    //           child: products.isEmpty
+    //               ? Row(
+    //                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    //                   children: [
+    //                     Text("Empty storage"),
+    //                     ElevatedButton.icon(
+    //                       label: Text.rich(TextSpan(text: "Add Products")),
+    //                       onPressed: () {
+    //                         context.push(ProductRoutes.add);
+    //                       },
+    //                       icon: Icon(Icons.add),
+    //                     ),
+    //                   ],
+    //                 )
+    //               : Row(
+    //                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    //                   children: [
+    //                     Expanded(
+    //                       child: DropdownMenu(
+    //                         initialSelection: _selectedProduct,
+    //                         controller: _productController,
+
+    //                         helperText: "Ingredient",
+
+    //                         enableFilter: true,
+    //                         enableSearch: true,
+    //                         menuStyle: MenuStyle(
+    //                           shape: WidgetStatePropertyAll(
+    //                             RoundedRectangleBorder(
+    //                               borderRadius: BorderRadius.circular(8),
+    //                               side: BorderSide(
+    //                                 color: Colors.blue,
+    //                                 width: 2,
+    //                               ),
+    //                             ),
+    //                           ),
+    //                         ),
+
+    //                         dropdownMenuEntries: products
+    //                             .map(
+    //                               (p) => DropdownMenuEntry<ProductEntity>(
+    //                                 value: p,
+    //                                 label: p.name,
+    //                               ),
+    //                             )
+    //                             .toList(),
+    //                         onSelected: (value) {
+    //                           if (value != null) {
+    //                             setState(() {
+    //                               _selectedProduct = value;
+    //                             });
+    //                           }
+    //                         },
+    //                       ),
+    //                     ),
+    //                     Flexible(
+    //                       child: DropdownMenu(
+    //                         controller: _quantityController,
+    //                         initialSelection: _selectedQuantity,
+    //                         helperText: "Quantity",
+    //                         enableFilter: true,
+    //                         enableSearch: true,
+    //                         menuStyle: MenuStyle(
+    //                           shape: WidgetStatePropertyAll(
+    //                             RoundedRectangleBorder(
+    //                               borderRadius: BorderRadius.circular(8),
+    //                               side: BorderSide(
+    //                                 color: Colors.blue,
+    //                                 width: 2,
+    //                               ),
+    //                             ),
+    //                           ),
+    //                         ),
+
+    //                         dropdownMenuEntries:
+    //                             List.generate(9, (int index) => index + 1)
+    //                                 .map(
+    //                                   (i) => DropdownMenuEntry<int>(
+    //                                     value: i,
+    //                                     label: i.toString(),
+    //                                   ),
+    //                                 )
+    //                                 .toList(),
+
+    //                         onSelected: (value) {
+    //                           setState(() {
+    //                             _selectedQuantity = value ?? 0;
+    //                           });
+    //                         },
+    //                       ),
+    //                     ),
+    //                     Flexible(
+    //                       child: IconButton.filled(
+    //                         onPressed: () {
+    //                           if (_selectedProduct != null) {
+    //                             final duplicateId = _ingredients.indexWhere(
+    //                               (e) => e.name == _selectedProduct!.name,
+    //                             );
+
+    //                             if (duplicateId != -1) {
+    //                               setState(() {
+    //                                 _ingredients[duplicateId] =
+    //                                     _ingredients[duplicateId].copyWith(
+    //                                       quantity: _selectedQuantity ?? 0,
+    //                                     );
+    //                               });
+    //                             } else {
+    //                               setState(() {
+    //                                 _ingredients.add(
+    //                                   _selectedProduct!.copyWith(
+    //                                     quantity: _selectedQuantity ?? 0,
+    //                                   ),
+    //                                 );
+    //                               });
+    //                             }
+    //                             setState(() {
+    //                               _total = _ingredients.fold(0.0, (value, e) {
+    //                                 return value + e.price * e.quantity;
+    //                               });
+    //                             });
+
+    //                             _productController.clear();
+    //                             _quantityController.clear();
+    //                             return;
+    //                           }
+    //                         },
+    //                         icon: Icon(Icons.add),
+    //                       ),
+    //                     ),
+    //                   ],
+    //                 ),
+    //         ),
+    //         SliverToBoxAdapter(
+    //           child: Row(
+    //             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    //             children: [Text("Total: "), Text(_total.toStringAsFixed(2))],
+    //           ),
+    //         ),
+    //         SliverList.builder(
+    //           itemCount: _ingredients.length,
+    //           itemBuilder: (context, index) {
+    //             final ingredient = _ingredients.elementAt(index);
+    //             return ListTile(
+    //               leading: ingredient.images[0] != null
+    //                   ? Image.file(ingredient.images[0]!)
+    //                   : Image.asset("assets/no_image.png"),
+    //               subtitle: Text("${ingredient.quantity}x ${ingredient.price}"),
+    //               title: Text(ingredient.name),
+    //               trailing: IconButton.filled(
+    //                 onPressed: () {
+    //                   setState(() {
+    //                     _ingredients.removeAt(index);
+    //                   });
+    //                 },
+    //                 icon: Icon(Icons.delete),
+    //               ),
+    //             );
+    //           },
+    //         ),
+    //       ],
+    //     ),
+    //   ),
+    // );
   }
 }

@@ -1,37 +1,39 @@
 import 'package:floor/floor.dart';
 import 'package:meal_planner/data/local/models/recipe.model.dart';
 import 'package:meal_planner/data/views/views.dart';
+import 'package:meal_planner/domain/abstract/dao.dart';
 
 @dao
-abstract class RecipeDAO {
- 
-  @Insert(onConflict: OnConflictStrategy.replace)
-  Future<void> insertRecipe(RecipeModel recipe);
-
-  
-  @Insert(onConflict: OnConflictStrategy.replace)
-  Future<void> insertMany(List<RecipeModel> recipe);
-
+abstract class RecipeDAO implements DAO<RecipeModel, RecipeView> {
   @Query('SELECT * FROM recipe_view')
-  Future<List<Recipe>> getAll();
+  @override
+  Future<List<RecipeView>> findAll();
 
+  @Query('SELECT * FROM recipe_view WHERE id = :id')
+  @override
+  Future<RecipeView?> findById(String id);
 
-  @Query('SELECT * FROM recipes WHERE id = :id')
-  Future<RecipeModel?> findById(String id);
+  @Insert(onConflict: OnConflictStrategy.replace)
+  @override
+  Future<void> insert(RecipeModel data);
 
- 
-  @Query('DELETE FROM recipes WHERE id = :id')
-  Future<void> delete(String id);
+  @Insert(onConflict: OnConflictStrategy.replace)
+  @override
+  Future<void> insertAll(List<RecipeModel> data);
 
-  @Query('''
-    SELECT COALESCE(SUM(p.price * j.quantity), 0.0)
-    FROM products p
-    INNER JOIN recipe_product_join j ON j.product_id = p.id
-    WHERE j.recipe_id = :recipeId
-  ''')
-  Future<double?> _calculateTotal(String recipeId);
+  @Update(onConflict: OnConflictStrategy.replace)
+  @override
+  Future<void> update(RecipeModel data);
 
-  Future<double> calculateTotal(String recipeId) async {
-    return await _calculateTotal(recipeId) ?? 0.0;
-  }
+  @Update(onConflict: OnConflictStrategy.replace)
+  @override
+  Future<void> updateAll(List<RecipeModel> data);
+
+  @delete
+  @override
+  Future<void> removeAll(List<RecipeModel> data);
+
+  @delete
+  @override
+  Future<void> remove(RecipeModel id);
 }

@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
 
-final class FileStorageService {
+class FileStorageService {
   const FileStorageService();
   Future<Directory> _getBaseDir() async {
     return await getApplicationDocumentsDirectory();

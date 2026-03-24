@@ -17,14 +17,11 @@ final _privateConstructorUsedError = UnsupportedError(
 /// @nodoc
 mixin _$ProductEntity {
   String get id => throw _privateConstructorUsedError;
-  @Assert('name.isNotEmpty', 'name cannot be empty')
   String get name => throw _privateConstructorUsedError;
   String? get description => throw _privateConstructorUsedError;
-  @Assert('price >= 0', 'price cannot be negative')
   double get price => throw _privateConstructorUsedError;
-  @Assert('quantity >= 0', 'quantity cannot be negative')
   int get quantity => throw _privateConstructorUsedError;
-  File? get image => throw _privateConstructorUsedError;
+  List<File?> get images => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $ProductEntityCopyWith<ProductEntity> get copyWith =>
@@ -39,11 +36,11 @@ abstract class $ProductEntityCopyWith<$Res> {
   @useResult
   $Res call(
       {String id,
-      @Assert('name.isNotEmpty', 'name cannot be empty') String name,
+      String name,
       String? description,
-      @Assert('price >= 0', 'price cannot be negative') double price,
-      @Assert('quantity >= 0', 'quantity cannot be negative') int quantity,
-      File? image});
+      double price,
+      int quantity,
+      List<File?> images});
 }
 
 /// @nodoc
@@ -64,7 +61,7 @@ class _$ProductEntityCopyWithImpl<$Res, $Val extends ProductEntity>
     Object? description = freezed,
     Object? price = null,
     Object? quantity = null,
-    Object? image = freezed,
+    Object? images = null,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -87,10 +84,10 @@ class _$ProductEntityCopyWithImpl<$Res, $Val extends ProductEntity>
           ? _value.quantity
           : quantity // ignore: cast_nullable_to_non_nullable
               as int,
-      image: freezed == image
-          ? _value.image
-          : image // ignore: cast_nullable_to_non_nullable
-              as File?,
+      images: null == images
+          ? _value.images
+          : images // ignore: cast_nullable_to_non_nullable
+              as List<File?>,
     ) as $Val);
   }
 }
@@ -105,11 +102,11 @@ abstract class _$$ProductEntityImplCopyWith<$Res>
   @useResult
   $Res call(
       {String id,
-      @Assert('name.isNotEmpty', 'name cannot be empty') String name,
+      String name,
       String? description,
-      @Assert('price >= 0', 'price cannot be negative') double price,
-      @Assert('quantity >= 0', 'quantity cannot be negative') int quantity,
-      File? image});
+      double price,
+      int quantity,
+      List<File?> images});
 }
 
 /// @nodoc
@@ -128,7 +125,7 @@ class __$$ProductEntityImplCopyWithImpl<$Res>
     Object? description = freezed,
     Object? price = null,
     Object? quantity = null,
-    Object? image = freezed,
+    Object? images = null,
   }) {
     return _then(_$ProductEntityImpl(
       id: null == id
@@ -151,46 +148,47 @@ class __$$ProductEntityImplCopyWithImpl<$Res>
           ? _value.quantity
           : quantity // ignore: cast_nullable_to_non_nullable
               as int,
-      image: freezed == image
-          ? _value.image
-          : image // ignore: cast_nullable_to_non_nullable
-              as File?,
+      images: null == images
+          ? _value._images
+          : images // ignore: cast_nullable_to_non_nullable
+              as List<File?>,
     ));
   }
 }
 
 /// @nodoc
 
-class _$ProductEntityImpl extends _ProductEntity {
+class _$ProductEntityImpl implements _ProductEntity {
   const _$ProductEntityImpl(
       {required this.id,
-      @Assert('name.isNotEmpty', 'name cannot be empty') required this.name,
+      required this.name,
       required this.description,
-      @Assert('price >= 0', 'price cannot be negative') required this.price,
-      @Assert('quantity >= 0', 'quantity cannot be negative')
+      required this.price,
       required this.quantity,
-      required this.image})
-      : super._();
+      required final List<File?> images})
+      : _images = images;
 
   @override
   final String id;
   @override
-  @Assert('name.isNotEmpty', 'name cannot be empty')
   final String name;
   @override
   final String? description;
   @override
-  @Assert('price >= 0', 'price cannot be negative')
   final double price;
   @override
-  @Assert('quantity >= 0', 'quantity cannot be negative')
   final int quantity;
+  final List<File?> _images;
   @override
-  final File? image;
+  List<File?> get images {
+    if (_images is EqualUnmodifiableListView) return _images;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_images);
+  }
 
   @override
   String toString() {
-    return 'ProductEntity(id: $id, name: $name, description: $description, price: $price, quantity: $quantity, image: $image)';
+    return 'ProductEntity(id: $id, name: $name, description: $description, price: $price, quantity: $quantity, images: $images)';
   }
 
   @override
@@ -205,12 +203,12 @@ class _$ProductEntityImpl extends _ProductEntity {
             (identical(other.price, price) || other.price == price) &&
             (identical(other.quantity, quantity) ||
                 other.quantity == quantity) &&
-            (identical(other.image, image) || other.image == image));
+            const DeepCollectionEquality().equals(other._images, _images));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, id, name, description, price, quantity, image);
+  int get hashCode => Object.hash(runtimeType, id, name, description, price,
+      quantity, const DeepCollectionEquality().hash(_images));
 
   @JsonKey(ignore: true)
   @override
@@ -219,34 +217,27 @@ class _$ProductEntityImpl extends _ProductEntity {
       __$$ProductEntityImplCopyWithImpl<_$ProductEntityImpl>(this, _$identity);
 }
 
-abstract class _ProductEntity extends ProductEntity {
+abstract class _ProductEntity implements ProductEntity {
   const factory _ProductEntity(
       {required final String id,
-      @Assert('name.isNotEmpty', 'name cannot be empty')
       required final String name,
       required final String? description,
-      @Assert('price >= 0', 'price cannot be negative')
       required final double price,
-      @Assert('quantity >= 0', 'quantity cannot be negative')
       required final int quantity,
-      required final File? image}) = _$ProductEntityImpl;
-  const _ProductEntity._() : super._();
+      required final List<File?> images}) = _$ProductEntityImpl;
 
   @override
   String get id;
   @override
-  @Assert('name.isNotEmpty', 'name cannot be empty')
   String get name;
   @override
   String? get description;
   @override
-  @Assert('price >= 0', 'price cannot be negative')
   double get price;
   @override
-  @Assert('quantity >= 0', 'quantity cannot be negative')
   int get quantity;
   @override
-  File? get image;
+  List<File?> get images;
   @override
   @JsonKey(ignore: true)
   _$$ProductEntityImplCopyWith<_$ProductEntityImpl> get copyWith =>
