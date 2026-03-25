@@ -27,7 +27,7 @@ abstract class ProductEntity with _$ProductEntity {
       description: dto.description,
       price: dto.price,
       quantity: dto.quantity,
-      images: [dto.image]
+      images: dto.images
     );
   }
 

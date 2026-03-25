@@ -7,18 +7,14 @@ final class CreateProductDTO {
   final double _price;
   final int _quantity;
   final String description;
-  final XFile? _image;
+  final List<XFile?> _images;
 
-  CreateProductDTO({
-    required String name,
-    required String price,
-    required String quantity,
-    required this.description,
-    XFile? image,
-  }) : _name = name, _price = double.tryParse(price) ?? 0.0, _quantity = int.tryParse(quantity) ?? 0, _image = image;
+  CreateProductDTO({required String name, required double price, required int quantity, required this.description, required List<XFile?> images}) : _name = name, _price = price, _quantity = quantity, _images = images;
+
+  
 
   String get name => _name;
   double get price => _price;
   int get quantity => _quantity;
-  File? get image => _image != null ? File(_image.path) : null;
+  List<File?> get images => _images.map((e) => File(e!.path)).toList();
 }

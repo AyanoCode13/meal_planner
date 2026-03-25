@@ -12,3 +12,7 @@ RecipeAndProduct - flutter test test/db/models/recipe_product_join_test.dart --r
 # View Tests
 Recipe View - flutter test test/db/views/recipe.view_test.dart --reporter expanded
 flutter packages pub run build_runner watch
+flutter test test/db/repositories --reporter expanded
+
+# Mockito
+dart run build_runner build --delete-conflicting-outputs
