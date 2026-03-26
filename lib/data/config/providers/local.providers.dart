@@ -6,7 +6,7 @@ import 'package:meal_planner/domain/abstract/repository.dart';
 import 'package:meal_planner/domain/abstract/use_case.dart';
 import 'package:meal_planner/domain/entities/product/product.entity.dart';
 import 'package:meal_planner/domain/entities/recipe/recipe.entity.dart';
-import 'package:meal_planner/domain/useCase/add.product.useCase.dart';
+import 'package:meal_planner/domain/useCase/product/add.product.useCase.dart';
 import 'package:meal_planner/domain/useCase/recipe.getById.dart';
 import 'package:meal_planner/service/file.storage.service.dart';
 import 'package:meal_planner/ui/viewModels/product.viewModel.dart';

@@ -6,11 +6,6 @@ A new Flutter project.
     flutter packages pub run build_runner watch
 # Mockito
     dart run build_runner build watch --delete-conflicting-outputs
-# Repository Tests
-    flutter test test/db/repositories --reporter expanded
-# Product Repository
-    flutter test test/db/repositories/product/product.repository_test.dart --reporter expanded
-# Recipe Repository 
-    flutter test test/db/repositories/product/recipe.repository_test.dart --reporter expanded
-
- 
+# Test
+    - Product - flutter test test/product --reporter expanded
+    - Recipe - flutter test test/recipe --reporter expanded

@@ -1,53 +1,29 @@
-import 'dart:io';
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:meal_planner/data/local/models/image.model.dart';
-import 'package:meal_planner/data/local/repository/local/local.product.repository.dart';
-import 'package:meal_planner/domain/abstract/repository.dart';
-import 'package:meal_planner/domain/dto/product/create.product.dto.dart';
-import 'package:meal_planner/domain/entities/product/product.entity.dart';
-import 'package:meal_planner/domain/useCase/add.product.useCase.dart';
+import 'package:meal_planner/domain/useCase/product/add.product.useCase.dart';
 import 'package:meal_planner/utils/result.dart';
-import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 
-import 'product_test.mocks.dart';
+import 'mocks/data.dart';
+import 'mocks/mocks.mocks.dart';
 
-@GenerateMocks([
-  LocalProductRepository, // the base repo injected via super.repository
-  FileRepository,
-])
 void main() {
   late MockLocalProductRepository mockLocalProductRepository;
   late MockFileRepository mockFileRepository;
   late AddProductUseCase useCase;
   // Files
-  final file1 = File("file1.png");
-  final file2 = File("file2.png");
-  final files = [file1, file2];
-
-  // Products
-  final product1 = ProductEntity.create(
-    dto: CreateProductDTO(name: "Product 1", images: files),
-  );
-  final product2 = ProductEntity.create(
-    dto: CreateProductDTO(name: "Product 2"),
-  );
 
   setUpAll(() {
-    // Ok
-    provideDummy<Result<void>>(Result.ok(null));
-    provideDummy<Result<List<String>>>(Result.ok([]));
-    provideDummy<Result<List<ProductEntity>>>(Result.ok([]));
-    // Error
-    provideDummy<Result<void>>(Result.error(Exception()));
-    provideDummy<Result<List<String>>>(Result.error(Exception()));
-    provideDummy<Result<List<ProductEntity>>>(Result.error(Exception()));
+    registerCommonDummies();
   });
 
   setUp(() {
-    mockLocalProductRepository = MockLocalProductRepository();
-    mockFileRepository = MockFileRepository();
+    setupMocks(
+      assign: (repo, fileRepo) {
+        mockLocalProductRepository = repo;
+        mockFileRepository = fileRepo;
+      },
+    );
 
     useCase = AddProductUseCase(
       repository: mockLocalProductRepository,
@@ -196,25 +172,22 @@ void main() {
   });
 
   group('interaction ordering', () {
-    test(
-      'always calls product repository before FileRepository',
-      () async {
-        final order = <String>[];
-       
-        when(mockLocalProductRepository.add(any)).thenAnswer((_) async {
-          order.add('product_repo');
-          return Result.ok(null);
-        });
+    test('always calls product repository before FileRepository', () async {
+      final order = <String>[];
 
-        when(mockFileRepository.insertAll(any)).thenAnswer((_) async {
-          order.add('file_repo');
-          return Result.ok([]);
-        });
+      when(mockLocalProductRepository.add(any)).thenAnswer((_) async {
+        order.add('product_repo');
+        return Result.ok(null);
+      });
 
-        await useCase.call(data: product1);
+      when(mockFileRepository.insertAll(any)).thenAnswer((_) async {
+        order.add('file_repo');
+        return Result.ok([]);
+      });
 
-        expect(order, equals(['product_repo', 'file_repo']));
-      },
-    );
+      await useCase.call(data: product1);
+
+      expect(order, equals(['product_repo', 'file_repo']));
+    });
   });
 }
