@@ -47,6 +47,6 @@ app.*.map.json
 
 
 # Generated Files
-.mocks.dart
-.freezed.dart
-.g.dart
+*.mocks.dart
+*.freezed.dart
+*.g.dart
