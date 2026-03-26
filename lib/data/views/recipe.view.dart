@@ -10,17 +10,14 @@ class RecipeView{
   final String name;
   final String description;
   final double? total; 
-  final String? file;
+  
   final int preparationTime;
+  final DateTime createdAt;
+  final DateTime upatedAt;
 
-  RecipeView({
-    required this.id,
-    required this.name,
-    required this.description,
-    required this.total, 
-    required this.file, 
-    required this.preparationTime, 
-  });
+  RecipeView({required this.id, required this.name, required this.description, required this.total, required this.preparationTime, required this.createdAt, required this.upatedAt});
+
+
 }
 
 

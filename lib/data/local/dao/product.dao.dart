@@ -1,6 +1,7 @@
 import 'package:floor/floor.dart';
 import 'package:meal_planner/data/local/models/product.model.dart';
 import 'package:meal_planner/domain/abstract/dao.dart';
+import 'package:meal_planner/domain/entities/product/product.entity.dart';
 
 @dao
 abstract class ProductDAO extends DAO<ProductModel, ProductModel> {
@@ -35,4 +36,12 @@ abstract class ProductDAO extends DAO<ProductModel, ProductModel> {
   @delete
   @override
   Future<void> remove(ProductModel data);
+
+  // Get all products for a specific recipe
+  @Query('''
+    SELECT p.* FROM products p
+    INNER JOIN recipe_product_join rpj ON p.id = rpj.productId
+    WHERE rpj.recipeId = :recipeId
+  ''')
+  Future<List<ProductModel>> getProductsForRecipe(String recipeId);
 }

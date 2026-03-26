@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:meal_planner/data/local/models/models.dart';
 import 'package:meal_planner/domain/dto/product/create.product.dto.dart';
-import 'package:uuid/uuid.dart';
+import 'package:uuid/v4.dart';
 
 part 'product.entity.freezed.dart';
 
@@ -12,35 +12,24 @@ abstract class ProductEntity with _$ProductEntity {
   const factory ProductEntity({
     required String id,
     required String name,
-    required String? description,
-    required double price,
-    required int quantity,
-    required List<File?> images,
+    @Default("")
+    String? description,
+    @Default(0.0) double price,
+    @Default(1) int quantity,
+    @Default([]) List<File?> images,
   }) = _ProductEntity;
 
-  factory ProductEntity.create({
-    required CreateProductDTO dto,
-  }) {
+  factory ProductEntity.create({required CreateProductDTO dto}) {
     return ProductEntity(
-      id: const Uuid().v4(),
+      id: const UuidV4().toString(),
       name: dto.name,
-      description: dto.description,
-      price: dto.price,
-      quantity: dto.quantity,
-      images: dto.images
     );
   }
 
-  factory ProductEntity.fromModel({ required ProductModel data, required List<File?> images }){
+  factory ProductEntity.fromModel({required ProductModel data}) {
     return ProductEntity(
       id: data.id,
       name: data.name,
-      description: data.description,
-      price: data.price,
-      quantity: data.quantity,
-      images: images
     );
   }
-  
-
 }

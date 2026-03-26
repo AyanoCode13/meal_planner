@@ -1,4 +1,3 @@
-
 import 'dart:io';
 
 import 'package:meal_planner/data/local/dao/recipe.dao.dart';
@@ -16,11 +15,9 @@ class LocalRecipeRepository
 
   LocalRecipeRepository({
     required RecipeDAO recipeDAO,
-    required super.imageDAO,
-    required super.fileStorageService,
     required RecipesAndProductsDAO recipesAndProductsDAO,
-  })  : _recipeDAO = recipeDAO,
-        _recipesAndProductsDAO = recipesAndProductsDAO;
+  }) : _recipeDAO = recipeDAO,
+       _recipesAndProductsDAO = recipesAndProductsDAO;
 
   @override
   Future<List<RecipeView>> fetchAll() => _recipeDAO.findAll();
@@ -44,15 +41,11 @@ class LocalRecipeRepository
   String entityIdOf(RecipeEntity entity) => entity.id;
 
   @override
-  List<File?> imagesOf(RecipeEntity entity) => entity.images;
-
-  @override
   RecipeModel toWriteModel(RecipeEntity entity) =>
       RecipeModel.fromEntity(data: entity);
 
   @override
-  RecipeEntity toEntity(RecipeView model, List<File?> images) =>
-      RecipeEntity.fromView(data: model, images: images);
+  RecipeEntity toEntity(RecipeView model) => RecipeEntity.fromView(model);
 
   // Insert join table rows after a recipe is saved
   @override

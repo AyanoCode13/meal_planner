@@ -3,8 +3,8 @@ import 'package:floor/floor.dart';
 class ImageModel {
   final String id;
   final String url;
-  final bool isThumbnail;
+  bool? isThumbnail = false;
 
-  ImageModel({required this.id, required this.url, required this.isThumbnail});
+  ImageModel({required this.id, required this.url, this.isThumbnail});
   
 }

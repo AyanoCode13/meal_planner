@@ -1,31 +1,25 @@
-import 'dart:io';
-
-import 'package:meal_planner/data/local/dao/image.dao.dart';
 import 'package:meal_planner/data/local/models/image.model.dart';
-import 'package:meal_planner/service/file.storage.service.dart';
 import 'package:meal_planner/utils/result.dart';
 
 abstract class Repository<T> {
   Future<Result<void>> add(T data);
-  Future<Result<List<void>>> addAll(List<T> data);
+  Future<Result<void>> addAll(List<T> data);
   Future<Result<void>> update(T data);
-  Future<Result<List<void>>> updateAll(List<T> data);
+  Future<Result<void>> updateAll(List<T> data);
   Future<Result<void>> delete(T data);
-  Future<Result<List<void>>> deleteAll(List<T> data);
+  Future<Result<void>> deleteAll(List<T> data);
   Future<Result<List<T>>> getAll();
   Future<Result<T?>> getById(String data);
 }
 
+abstract class FileRepository {
+  Future<Result<String>> insert(ImageModel data);
+  Future<Result<List<String>>> insertAll(List<ImageModel> data);
+  Future<Result<void>> delete(String id);
+  Future<Result<void>> deleteAll(String id);
+}
 
 abstract class LocalRepository<T, R, W> implements Repository<T> {
-  final ImageDAO _imageDAO;
-  final FileStorageService _fileStorageService;
-
-  LocalRepository({
-    required ImageDAO imageDAO,
-    required FileStorageService fileStorageService,
-  })  : _imageDAO = imageDAO,
-        _fileStorageService = fileStorageService;
 
   // --- DAO operations ---
   Future<List<R>> fetchAll();
@@ -34,46 +28,24 @@ abstract class LocalRepository<T, R, W> implements Repository<T> {
   Future<void> updateModel(W model);
   Future<void> removeModel(W model);
 
-  // --- Mapping ---
-  String idOf(R model);
-  String entityIdOf(T entity);
-  List<File?> imagesOf(T entity);
-  W toWriteModel(T entity);
-  T toEntity(R model, List<File?> images);
-
   // --- Lifecycle hooks (optional overrides) ---
+
   Future<void> onAfterInsert(T entity) async {}
   Future<void> onBeforeDelete(T entity) async {}
 
-  // --- Private helpers ---
-  Future<List<File?>> _loadImages(String ownerId) async {
-    final images = await _imageDAO.findByOwner(ownerId);
-    return images
-        .map((i) async => _fileStorageService.getFile(
-              folder: ownerId,
-              fileName: i.url,
-            ))
-        .wait;
-  }
+  // --- Mapping ---
+  String idOf(R model);
+  String entityIdOf(T entity);
 
-  Future<void> _saveImages(T entity) async {
-    final id = entityIdOf(entity);
-    final urls = await imagesOf(entity)
-        .map((i) async => _fileStorageService.saveFile(file: i!, folder: id))
-        .wait;
-    await _imageDAO.insertAll(
-      urls.map((u) => ImageModel(id: id, url: u, isThumbnail: false)).toList(),
-    );
-  }
+  W toWriteModel(T entity);
+  T toEntity(R model);
 
   // --- CRUD ---
   @override
   Future<Result<List<T>>> getAll() async {
     try {
       final models = await fetchAll();
-      final res = await models
-          .map((m) async => toEntity(m, await _loadImages(idOf(m))))
-          .wait;
+      final res = await models.map((m) async => toEntity(m)).wait;
       return Result.ok(res);
     } on Exception catch (e) {
       return Result.error(e);
@@ -85,7 +57,7 @@ abstract class LocalRepository<T, R, W> implements Repository<T> {
     try {
       final model = await fetchById(id);
       if (model == null) return Result.ok(null);
-      return Result.ok(toEntity(model, await _loadImages(idOf(model))));
+      return Result.ok(toEntity(model));
     } on Exception catch (e) {
       return Result.error(e);
     }
@@ -94,8 +66,8 @@ abstract class LocalRepository<T, R, W> implements Repository<T> {
   @override
   Future<Result<void>> add(T data) async {
     try {
-      await (insertModel(toWriteModel(data)), _saveImages(data)).wait;
-      await onAfterInsert(data);
+      await insertModel(toWriteModel(data));
+
       return Result.ok(null);
     } on Exception catch (e) {
       return Result.error(e);
@@ -132,13 +104,8 @@ abstract class LocalRepository<T, R, W> implements Repository<T> {
   @override
   Future<Result<void>> delete(T data) async {
     try {
-      await onBeforeDelete(data);
-      final id = entityIdOf(data);
-      await (
-        _imageDAO.deleteFromOwner(id),
-        _fileStorageService.deleteFiles(folder: id),
-        removeModel(toWriteModel(data)),
-      ).wait;
+      await delete(data);
+
       return Result.ok(null);
     } on Exception catch (e) {
       return Result.error(e);

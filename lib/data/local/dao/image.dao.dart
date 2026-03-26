@@ -16,5 +16,5 @@ abstract class ImageDAO {
   Future<void> insertAll(List<ImageModel> data);
 
   @Query('DELETE * FROM images WHERE id = :ownerId')
-  Future<void> deleteFromOwner(String ownerId);
+  Future<void> removeAll(String ownerId);
 }

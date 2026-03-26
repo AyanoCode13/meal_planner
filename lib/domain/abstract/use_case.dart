@@ -1,69 +1,41 @@
 import 'package:meal_planner/domain/abstract/repository.dart';
 import 'package:meal_planner/utils/result.dart';
 
-abstract class UseCase<I, O> {
-  Future<Result<O>> call({required I data });
-}
-class GetAllUseCase<T> implements UseCase<void, List<T>> {
-  final Repository<T> _repository;
-
-  GetAllUseCase({required Repository<T> repository}) : _repository = repository;
-  
-  @override
-  Future<Result<List<T>>> call({required void data}) {
-    // TODO: implement call
-    return _repository.getAll();
-  }
+abstract class IUseCase<I, O> {
+  Future<Result<O>> call({required I data});
 }
 
-class GetByIdUseCase<T> implements UseCase<String, T?> {
-  final Repository<T> _repository;
+class BaseUseCase<R, I, O> implements IUseCase<I, O> {
+  final Repository<R> _repository;
 
-  GetByIdUseCase({required Repository<T> repository}) : _repository = repository;
-  
-  @override
-  Future<Result<T?>> call({required String data}) async {
-    // TODO: implement call
-    return await _repository.getById(data);
-  }
-  
-  
-}
-
-class AddUseCase<T> implements UseCase<T,void> {
-  final Repository<T> _repository;
-
-  AddUseCase({required Repository<T> repository}) : _repository = repository;
+  BaseUseCase({required Repository<R> repository}) : _repository = repository;
 
   @override
-  Future<Result<void>> call({required T data}) async {
+  Future<Result<O>> call({required data}) {
     // TODO: implement call
-    return await _repository.add(data);
+    throw UnimplementedError();
   }
+
+
+  Repository<R> get repository => _repository;
 }
 
-
-class UpdateUseCase<T> implements UseCase<T,void> {
-  final Repository<T> _repository;
-
-  UpdateUseCase({required Repository<T> repository}) : _repository = repository;
-
-  @override
-  Future<Result<void>> call({required T data}) async {
-    // TODO: implement call
-    return await _repository.update(data);
-  }
+class AddUseCase<T> extends BaseUseCase<T, T, void> {
+  AddUseCase({required super.repository});
 }
 
-class DeleteUseCase<T> implements UseCase<T,void> {
-  final Repository<T> _repository;
-
-  DeleteUseCase({required Repository<T> repository}) : _repository = repository;
-
-  @override
-  Future<Result<void>> call({required T data}) async {
-    // TODO: implement call
-    return await _repository.delete(data);
-  }
+class GetAllUseCase<T> extends BaseUseCase<T, void, List<T>> {
+  GetAllUseCase({required super.repository});
 }
 
+class GetByIdUseCase<T> extends BaseUseCase<T, String, T?> {
+  GetByIdUseCase({required super.repository});
+}
+
+class UpdateUseCase<T> extends BaseUseCase<T, T, void> {
+  UpdateUseCase({required super.repository});
+}
+
+class DeleteUseCase<T> extends BaseUseCase<T, T, void> {
+  DeleteUseCase({required super.repository});
+}

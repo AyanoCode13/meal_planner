@@ -1,7 +1,3 @@
-
-
-
-
 abstract class DAO<I,O> {
   Future<List<O>> findAll();
   Future<O?> findById(String id);
@@ -12,5 +8,7 @@ abstract class DAO<I,O> {
   Future<void> remove(I id);
   Future<void> removeAll(List<I> data);
 }
+
+
 
 

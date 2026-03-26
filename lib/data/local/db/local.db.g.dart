@@ -106,7 +106,7 @@ class _$LocalDatabase extends LocalDatabase {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `recipes` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `description` TEXT, `preparationTime` INTEGER NOT NULL, `createdAt` TEXT NOT NULL, `updatedAt` TEXT NOT NULL, PRIMARY KEY (`id`))');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `images` (`id` TEXT NOT NULL, `url` TEXT NOT NULL, `isThumbnail` INTEGER NOT NULL, PRIMARY KEY (`id`, `url`))');
+            'CREATE TABLE IF NOT EXISTS `images` (`id` TEXT NOT NULL, `url` TEXT NOT NULL, `isThumbnail` INTEGER, PRIMARY KEY (`id`, `url`))');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `recipe_product_join` (`recipeId` TEXT NOT NULL, `productId` TEXT NOT NULL, `quantity` INTEGER NOT NULL, FOREIGN KEY (`recipeId`) REFERENCES `recipes` (`id`) ON UPDATE NO ACTION ON DELETE CASCADE, FOREIGN KEY (`productId`) REFERENCES `products` (`id`) ON UPDATE NO ACTION ON DELETE CASCADE, PRIMARY KEY (`recipeId`, `productId`))');
         await database.execute(
@@ -226,6 +226,14 @@ class _$ProductDAO extends ProductDAO {
   }
 
   @override
+  Future<List<ProductModel>> getProductsForRecipe(String recipeId) async {
+    return _queryAdapter.queryList(
+        'SELECT p.* FROM products p     INNER JOIN recipe_product_join rpj ON p.id = rpj.productId     WHERE rpj.recipeId = ?1',
+        mapper: (Map<String, Object?> row) => ProductModel(id: row['id'] as String, name: row['name'] as String, description: row['description'] as String?, price: row['price'] as double, quantity: row['quantity'] as int),
+        arguments: [recipeId]);
+  }
+
+  @override
   Future<void> insert(ProductModel data) async {
     await _productModelInsertionAdapter.insert(
         data, OnConflictStrategy.replace);
@@ -323,8 +331,9 @@ class _$RecipeDAO extends RecipeDAO {
             name: row['name'] as String,
             description: row['description'] as String,
             total: row['total'] as double?,
-            file: row['file'] as String?,
-            preparationTime: row['preparationTime'] as int));
+            preparationTime: row['preparationTime'] as int,
+            createdAt: _dateTimeConverter.decode(row['createdAt'] as String),
+            upatedAt: _dateTimeConverter.decode(row['upatedAt'] as String)));
   }
 
   @override
@@ -335,8 +344,9 @@ class _$RecipeDAO extends RecipeDAO {
             name: row['name'] as String,
             description: row['description'] as String,
             total: row['total'] as double?,
-            file: row['file'] as String?,
-            preparationTime: row['preparationTime'] as int),
+            preparationTime: row['preparationTime'] as int,
+            createdAt: _dateTimeConverter.decode(row['createdAt'] as String),
+            upatedAt: _dateTimeConverter.decode(row['upatedAt'] as String)),
         arguments: [id]);
   }
 
@@ -384,7 +394,9 @@ class _$ImageDAO extends ImageDAO {
             (ImageModel item) => <String, Object?>{
                   'id': item.id,
                   'url': item.url,
-                  'isThumbnail': item.isThumbnail ? 1 : 0
+                  'isThumbnail': item.isThumbnail == null
+                      ? null
+                      : (item.isThumbnail! ? 1 : 0)
                 });
 
   final sqflite.DatabaseExecutor database;
@@ -401,7 +413,9 @@ class _$ImageDAO extends ImageDAO {
         mapper: (Map<String, Object?> row) => ImageModel(
             id: row['id'] as String,
             url: row['url'] as String,
-            isThumbnail: (row['isThumbnail'] as int) != 0));
+            isThumbnail: row['isThumbnail'] == null
+                ? null
+                : (row['isThumbnail'] as int) != 0));
   }
 
   @override
@@ -410,12 +424,14 @@ class _$ImageDAO extends ImageDAO {
         mapper: (Map<String, Object?> row) => ImageModel(
             id: row['id'] as String,
             url: row['url'] as String,
-            isThumbnail: (row['isThumbnail'] as int) != 0),
+            isThumbnail: row['isThumbnail'] == null
+                ? null
+                : (row['isThumbnail'] as int) != 0),
         arguments: [ownerId]);
   }
 
   @override
-  Future<void> deleteFromOwner(String ownerId) async {
+  Future<void> removeAll(String ownerId) async {
     await _queryAdapter.queryNoReturn('DELETE * FROM images WHERE id = ?1',
         arguments: [ownerId]);
   }

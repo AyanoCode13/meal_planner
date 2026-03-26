@@ -162,10 +162,10 @@ class _$ProductEntityImpl implements _ProductEntity {
   const _$ProductEntityImpl(
       {required this.id,
       required this.name,
-      required this.description,
-      required this.price,
-      required this.quantity,
-      required final List<File?> images})
+      this.description = "",
+      this.price = 0.0,
+      this.quantity = 1,
+      final List<File?> images = const []})
       : _images = images;
 
   @override
@@ -173,13 +173,17 @@ class _$ProductEntityImpl implements _ProductEntity {
   @override
   final String name;
   @override
+  @JsonKey()
   final String? description;
   @override
+  @JsonKey()
   final double price;
   @override
+  @JsonKey()
   final int quantity;
   final List<File?> _images;
   @override
+  @JsonKey()
   List<File?> get images {
     if (_images is EqualUnmodifiableListView) return _images;
     // ignore: implicit_dynamic_type
@@ -221,10 +225,10 @@ abstract class _ProductEntity implements ProductEntity {
   const factory _ProductEntity(
       {required final String id,
       required final String name,
-      required final String? description,
-      required final double price,
-      required final int quantity,
-      required final List<File?> images}) = _$ProductEntityImpl;
+      final String? description,
+      final double price,
+      final int quantity,
+      final List<File?> images}) = _$ProductEntityImpl;
 
   @override
   String get id;

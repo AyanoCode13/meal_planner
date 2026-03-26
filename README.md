@@ -2,17 +2,31 @@
 
 A new Flutter project.
 
-Run tests - flutter test test/db/models --reporter expanded
-
-# Model Tests
-Product - flutter test test/db/models/model.product_test.dart --reporter expanded
-Image - flutter test test/db/models/image.model_test.dart --reporter expanded
-RecipeAndProduct - flutter test test/db/models/recipe_product_join_test.dart --reporter expanded
-
-# View Tests
-Recipe View - flutter test test/db/views/recipe.view_test.dart --reporter expanded
-flutter packages pub run build_runner watch
-flutter test test/db/repositories --reporter expanded
-
+# Floor Database
+    flutter packages pub run build_runner watch
 # Mockito
-dart run build_runner build --delete-conflicting-outputs
+    dart run build_runner build watch --delete-conflicting-outputs
+# Repository Tests
+    flutter test test/db/repositories --reporter expanded
+# Product Repository
+    flutter test test/db/repositories/product/product.repository_test.dart --reporter expanded
+# Recipe Repository 
+    flutter test test/db/repositories/product/recipe.repository_test.dart --reporter expanded
+Future<RecipeEntity> withDetails(RecipeEntity model) async {
+    final res = await _productDAO.getProductsForRecipe(model.id);
+    final ingredients = res.map((e) => ProductEntity.asIngredient(data: e)).toList();
+    return model.copyWith(ingredients: ingredients);
+  }
+
+    Future<Result<List<ProductEntity>>> getProductsForRecipe(
+    String recipeId,
+  ) async {
+    try {
+      final products = await _productDAO.getProductsForRecipe(recipeId);
+      return Result.ok(
+        products.map((e) => ProductEntity.asIngredient(data: e)).toList(),
+      );
+    } on Exception catch (e) {
+      return Result.error(e);
+    }
+  }
