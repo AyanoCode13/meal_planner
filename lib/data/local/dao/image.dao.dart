@@ -6,15 +6,18 @@ abstract class ImageDAO {
   @Query('SELECT * FROM images')
   Future<List<ImageModel>> findAll();
 
-  @Query('SELECT * FROM images WHERE id = :ownerId')
-  Future<List<ImageModel>> findByOwner(String ownerId);
+  @Query('SELECT * FROM images WHERE id = :id')
+  Future<List<ImageModel>> findByOwner(String id);
 
-  @Insert(onConflict: OnConflictStrategy.replace)
+  @Insert(onConflict: OnConflictStrategy.rollback)
   Future<void> insert(ImageModel data);
 
-  @Insert(onConflict: OnConflictStrategy.replace)
+  @Insert(onConflict: OnConflictStrategy.rollback)
   Future<void> insertAll(List<ImageModel> data);
 
-  @Query('DELETE * FROM images WHERE id = :ownerId')
-  Future<void> removeAll(String ownerId);
+  @delete
+  Future<void> remove(ImageModel data);
+
+  @delete
+  Future<void> removeAll(List<ImageModel> data);
 }

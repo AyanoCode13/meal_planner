@@ -15,8 +15,8 @@ abstract class Repository<T> {
 abstract class FileRepository {
   Future<Result<String>> insert(ImageModel data);
   Future<Result<List<String>>> insertAll(List<ImageModel> data);
-  Future<Result<void>> delete(String id);
-  Future<Result<void>> deleteAll(String id);
+  Future<Result<void>> delete(ImageModel data);
+  Future<Result<void>> deleteAll(List<ImageModel> data);
 }
 
 abstract class LocalRepository<T, R, W> implements Repository<T> {

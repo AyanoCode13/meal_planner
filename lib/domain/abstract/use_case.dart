@@ -5,37 +5,57 @@ abstract class IUseCase<I, O> {
   Future<Result<O>> call({required I data});
 }
 
-class BaseUseCase<R, I, O> implements IUseCase<I, O> {
+abstract class _BaseUseCase<R, I, O> extends IUseCase<I, O> {
   final Repository<R> _repository;
-
-  BaseUseCase({required Repository<R> repository}) : _repository = repository;
-
-  @override
-  Future<Result<O>> call({required data}) {
-    // TODO: implement call
-    throw UnimplementedError();
-  }
-
-
-  Repository<R> get repository => _repository;
+  _BaseUseCase({required Repository<R> repository}) : _repository = repository;
 }
 
-class AddUseCase<T> extends BaseUseCase<T, T, void> {
+class AddUseCase<T> extends _BaseUseCase<T, T, void> {
   AddUseCase({required super.repository});
+  
+  @override
+  Future<Result<void>> call({required T data}) async {
+    // TODO: implement call
+    return await super._repository.add(data);
+  }
 }
 
-class GetAllUseCase<T> extends BaseUseCase<T, void, List<T>> {
+class GetAllUseCase<T> extends _BaseUseCase<T, void, List<T>> {
   GetAllUseCase({required super.repository});
+  
+  @override
+  Future<Result<List<T>>> call({required void data}) async {
+    // TODO: implement call
+    return await super._repository.getAll();
+  }
 }
 
-class GetByIdUseCase<T> extends BaseUseCase<T, String, T?> {
+class GetByIdUseCase<T> extends _BaseUseCase<T, String, T?> {
   GetByIdUseCase({required super.repository});
+  
+  @override
+  Future<Result<T?>> call({required String data}) async {
+    // TODO: implement call
+    return await super._repository.getById(data);
+  }
 }
 
-class UpdateUseCase<T> extends BaseUseCase<T, T, void> {
+class UpdateUseCase<T> extends _BaseUseCase<T, T, void> {
   UpdateUseCase({required super.repository});
+  
+  @override
+  Future<Result<void>> call({required T data}) async {
+    // TODO: implement call
+     return await super._repository.update(data);
+  }
 }
 
-class DeleteUseCase<T> extends BaseUseCase<T, T, void> {
+class DeleteUseCase<T> extends _BaseUseCase<T, T, void> {
   DeleteUseCase({required super.repository});
+  
+  @override
+  Future<Result<void>> call({required T data}) async {
+    // TODO: implement call
+     return await super._repository.delete(data);
+  }
 }

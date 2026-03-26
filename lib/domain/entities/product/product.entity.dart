@@ -16,13 +16,21 @@ abstract class ProductEntity with _$ProductEntity {
     String? description,
     @Default(0.0) double price,
     @Default(1) int quantity,
-    @Default([]) List<File?> images,
+    @Default([]) List<File> images,
+    required DateTime expiresAt,
+    required DateTime createAt,
+    required DateTime updatedAt,
+
   }) = _ProductEntity;
 
   factory ProductEntity.create({required CreateProductDTO dto}) {
     return ProductEntity(
       id: const UuidV4().toString(),
       name: dto.name,
+      images: dto.files,
+      expiresAt: DateTime.now().add(Duration(days: 7)),
+      createAt: DateTime.timestamp(),
+      updatedAt: DateTime.timestamp()
     );
   }
 
@@ -30,6 +38,9 @@ abstract class ProductEntity with _$ProductEntity {
     return ProductEntity(
       id: data.id,
       name: data.name,
+      expiresAt: data.expiersAt,
+      createAt: data.createdAt,
+      updatedAt: data.updatedAt
     );
   }
 }

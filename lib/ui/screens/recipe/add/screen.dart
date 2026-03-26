@@ -1,13 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:meal_planner/config/routing/routes/product.routes.dart';
-import 'package:meal_planner/domain/dto/product/create.product.dto.dart';
-import 'package:meal_planner/domain/dto/recipe/create.recipe.dto.dart';
 import 'package:meal_planner/domain/entities/product/product.entity.dart';
-import 'package:meal_planner/ui/shared/image.selector.dart';
 import 'package:meal_planner/ui/viewModels/product.viewModel.dart';
-import 'package:meal_planner/ui/viewModels/recipe.viewModel.dart';
 import 'package:provider/provider.dart';
 
 final class AddRecipeScreen extends StatefulWidget {

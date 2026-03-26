@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:meal_planner/data/local/dao/image.dao.dart';
 import 'package:meal_planner/data/local/models/image.model.dart';
 import 'package:meal_planner/domain/abstract/repository.dart';
@@ -8,32 +10,69 @@ class LocalFileRepository implements FileRepository {
   final ImageDAO _imageDAO;
   final FileStorageService _fileStorageService;
 
-  LocalFileRepository({required ImageDAO imageDAO, required FileStorageService fileStorageService}) : _imageDAO = imageDAO, _fileStorageService = fileStorageService;
+  LocalFileRepository({
+    required ImageDAO imageDAO,
+    required FileStorageService fileStorageService,
+  }) : _imageDAO = imageDAO,
+       _fileStorageService = fileStorageService;
 
   @override
-  Future<Result<String>> insert(ImageModel data) {
+  Future<Result<String>> insert(ImageModel data) async {
     // TODO: implement insert
-    throw UnimplementedError();
+    try {
+      await _imageDAO.insert(data);
+      final res = await _fileStorageService.save(
+        folder: data.id,
+        file: File(data.url),
+      );
+      return Result.ok(res);
+    } on Exception catch (e) {
+      await _imageDAO.insert(data);
+      return Result.error(e);
+    }
   }
 
   @override
-  Future<Result<List<String>>> insertAll(List<ImageModel> data) {
+  Future<Result<List<String>>> insertAll(List<ImageModel> data) async {
     // TODO: implement insertAll
-    throw UnimplementedError();
+
+    try {
+      await _imageDAO.insertAll(data);
+      final files = data.map((e) => File(e.url)).toList();
+      final paths = await _fileStorageService.saveAll(
+        files: files,
+        folder: data[0].id,
+      );
+      return Result.ok(paths);
+    } on Exception catch (e) {
+      await _imageDAO.removeAll(data);
+      return Result.error(e);
+    }
   }
+
   @override
-  Future<Result<void>> delete(String id) {
+  Future<Result<void>> delete(ImageModel data) async {
     // TODO: implement delete
-    throw UnimplementedError();
+    try {
+      final res = await _imageDAO.remove(data);
+      await _fileStorageService.delete(folder: data.id, fileName: data.url);
+      return Result.ok(res);
+    } on Exception catch (e) {
+      await _imageDAO.insert(data);
+      return Result.error(e);
+    }
   }
 
   @override
-  Future<Result<void>> deleteAll(String id) {
+  Future<Result<void>> deleteAll(List<ImageModel> data) async {
     // TODO: implement deleteAll
-    throw UnimplementedError();
+    try {
+      final res = await _imageDAO.removeAll(data);
+      await _fileStorageService.deleteAll(folder: data[0].id);
+      return Result.ok(res);
+    } on Exception catch (e) {
+      await _imageDAO.insertAll(data);
+      return Result.error(e);
+    }
   }
-
-
 }
- 
-

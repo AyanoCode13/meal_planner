@@ -388,33 +388,35 @@ class MockFileRepository extends _i1.Mock implements _i8.FileRepository {
       ) as _i5.Future<_i7.Result<List<String>>>);
 
   @override
-  _i5.Future<_i7.Result<void>> delete(String? id) => (super.noSuchMethod(
+  _i5.Future<_i7.Result<void>> delete(_i9.ImageModel? data) =>
+      (super.noSuchMethod(
         Invocation.method(
           #delete,
-          [id],
+          [data],
         ),
         returnValue:
             _i5.Future<_i7.Result<void>>.value(_i6.dummyValue<_i7.Result<void>>(
           this,
           Invocation.method(
             #delete,
-            [id],
+            [data],
           ),
         )),
       ) as _i5.Future<_i7.Result<void>>);
 
   @override
-  _i5.Future<_i7.Result<void>> deleteAll(String? id) => (super.noSuchMethod(
+  _i5.Future<_i7.Result<void>> deleteAll(List<_i9.ImageModel>? data) =>
+      (super.noSuchMethod(
         Invocation.method(
           #deleteAll,
-          [id],
+          [data],
         ),
         returnValue:
             _i5.Future<_i7.Result<void>>.value(_i6.dummyValue<_i7.Result<void>>(
           this,
           Invocation.method(
             #deleteAll,
-            [id],
+            [data],
           ),
         )),
       ) as _i5.Future<_i7.Result<void>>);

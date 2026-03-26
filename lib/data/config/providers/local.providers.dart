@@ -1,12 +1,17 @@
 import 'package:meal_planner/data/local/db/local.db.dart';
+import 'package:meal_planner/data/local/repository/local/local.file.repository.dart';
+import 'package:meal_planner/data/local/repository/local/local.product.repository.dart';
+import 'package:meal_planner/data/local/repository/local/local.recipe.repository.dart';
+import 'package:meal_planner/domain/abstract/repository.dart';
 import 'package:meal_planner/domain/abstract/use_case.dart';
+import 'package:meal_planner/domain/entities/product/product.entity.dart';
+import 'package:meal_planner/domain/entities/recipe/recipe.entity.dart';
+import 'package:meal_planner/domain/useCase/add.product.useCase.dart';
 import 'package:meal_planner/domain/useCase/recipe.getById.dart';
-import '../../data/local/repository/local/local.repository.dart';
+import 'package:meal_planner/service/file.storage.service.dart';
+import 'package:meal_planner/ui/viewModels/product.viewModel.dart';
+import 'package:meal_planner/ui/viewModels/recipe.viewModel.dart';
 
-import '../../domain/domain.dart';
-
-import '../../ui/viewModels/view.models.dart';
-import '../../service/service.dart';
 
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
@@ -19,6 +24,11 @@ Future<List<SingleChildWidget>> get localProviders async {
   final recipesAndProductsDAO = LocalDatabase.instance.recipesAndProductsDAO;
   final imageDAO = LocalDatabase.instance.imageDAO;
 
+  final localFileRepository = LocalFileRepository(
+    imageDAO: imageDAO,
+    fileStorageService: fileStorageService,
+  );
+
   // Product Providers
   final LocalProductRepository localProductRepository = LocalProductRepository(
     productDAO: productDAO,
@@ -29,8 +39,9 @@ Future<List<SingleChildWidget>> get localProviders async {
   final getProductByIdUseCase = GetByIdUseCase<ProductEntity>(
     repository: localProductRepository as Repository<ProductEntity>,
   );
-  final addProductUseCase = AddUseCase<ProductEntity>(
+  final addProductUseCase = AddProductUseCase(
     repository: localProductRepository as Repository<ProductEntity>,
+    fileRepository: localFileRepository,
   );
   final updateProductUseCase = UpdateUseCase<ProductEntity>(
     repository: localProductRepository as Repository<ProductEntity>,

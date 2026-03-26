@@ -21,7 +21,10 @@ mixin _$ProductEntity {
   String? get description => throw _privateConstructorUsedError;
   double get price => throw _privateConstructorUsedError;
   int get quantity => throw _privateConstructorUsedError;
-  List<File?> get images => throw _privateConstructorUsedError;
+  List<File> get images => throw _privateConstructorUsedError;
+  DateTime get expiresAt => throw _privateConstructorUsedError;
+  DateTime get createAt => throw _privateConstructorUsedError;
+  DateTime get updatedAt => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $ProductEntityCopyWith<ProductEntity> get copyWith =>
@@ -40,7 +43,10 @@ abstract class $ProductEntityCopyWith<$Res> {
       String? description,
       double price,
       int quantity,
-      List<File?> images});
+      List<File> images,
+      DateTime expiresAt,
+      DateTime createAt,
+      DateTime updatedAt});
 }
 
 /// @nodoc
@@ -62,6 +68,9 @@ class _$ProductEntityCopyWithImpl<$Res, $Val extends ProductEntity>
     Object? price = null,
     Object? quantity = null,
     Object? images = null,
+    Object? expiresAt = null,
+    Object? createAt = null,
+    Object? updatedAt = null,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -87,7 +96,19 @@ class _$ProductEntityCopyWithImpl<$Res, $Val extends ProductEntity>
       images: null == images
           ? _value.images
           : images // ignore: cast_nullable_to_non_nullable
-              as List<File?>,
+              as List<File>,
+      expiresAt: null == expiresAt
+          ? _value.expiresAt
+          : expiresAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      createAt: null == createAt
+          ? _value.createAt
+          : createAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      updatedAt: null == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
     ) as $Val);
   }
 }
@@ -106,7 +127,10 @@ abstract class _$$ProductEntityImplCopyWith<$Res>
       String? description,
       double price,
       int quantity,
-      List<File?> images});
+      List<File> images,
+      DateTime expiresAt,
+      DateTime createAt,
+      DateTime updatedAt});
 }
 
 /// @nodoc
@@ -126,6 +150,9 @@ class __$$ProductEntityImplCopyWithImpl<$Res>
     Object? price = null,
     Object? quantity = null,
     Object? images = null,
+    Object? expiresAt = null,
+    Object? createAt = null,
+    Object? updatedAt = null,
   }) {
     return _then(_$ProductEntityImpl(
       id: null == id
@@ -151,7 +178,19 @@ class __$$ProductEntityImplCopyWithImpl<$Res>
       images: null == images
           ? _value._images
           : images // ignore: cast_nullable_to_non_nullable
-              as List<File?>,
+              as List<File>,
+      expiresAt: null == expiresAt
+          ? _value.expiresAt
+          : expiresAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      createAt: null == createAt
+          ? _value.createAt
+          : createAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      updatedAt: null == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
     ));
   }
 }
@@ -165,7 +204,10 @@ class _$ProductEntityImpl implements _ProductEntity {
       this.description = "",
       this.price = 0.0,
       this.quantity = 1,
-      final List<File?> images = const []})
+      final List<File> images = const [],
+      required this.expiresAt,
+      required this.createAt,
+      required this.updatedAt})
       : _images = images;
 
   @override
@@ -181,18 +223,25 @@ class _$ProductEntityImpl implements _ProductEntity {
   @override
   @JsonKey()
   final int quantity;
-  final List<File?> _images;
+  final List<File> _images;
   @override
   @JsonKey()
-  List<File?> get images {
+  List<File> get images {
     if (_images is EqualUnmodifiableListView) return _images;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_images);
   }
 
   @override
+  final DateTime expiresAt;
+  @override
+  final DateTime createAt;
+  @override
+  final DateTime updatedAt;
+
+  @override
   String toString() {
-    return 'ProductEntity(id: $id, name: $name, description: $description, price: $price, quantity: $quantity, images: $images)';
+    return 'ProductEntity(id: $id, name: $name, description: $description, price: $price, quantity: $quantity, images: $images, expiresAt: $expiresAt, createAt: $createAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -207,12 +256,27 @@ class _$ProductEntityImpl implements _ProductEntity {
             (identical(other.price, price) || other.price == price) &&
             (identical(other.quantity, quantity) ||
                 other.quantity == quantity) &&
-            const DeepCollectionEquality().equals(other._images, _images));
+            const DeepCollectionEquality().equals(other._images, _images) &&
+            (identical(other.expiresAt, expiresAt) ||
+                other.expiresAt == expiresAt) &&
+            (identical(other.createAt, createAt) ||
+                other.createAt == createAt) &&
+            (identical(other.updatedAt, updatedAt) ||
+                other.updatedAt == updatedAt));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, id, name, description, price,
-      quantity, const DeepCollectionEquality().hash(_images));
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      name,
+      description,
+      price,
+      quantity,
+      const DeepCollectionEquality().hash(_images),
+      expiresAt,
+      createAt,
+      updatedAt);
 
   @JsonKey(ignore: true)
   @override
@@ -228,7 +292,10 @@ abstract class _ProductEntity implements ProductEntity {
       final String? description,
       final double price,
       final int quantity,
-      final List<File?> images}) = _$ProductEntityImpl;
+      final List<File> images,
+      required final DateTime expiresAt,
+      required final DateTime createAt,
+      required final DateTime updatedAt}) = _$ProductEntityImpl;
 
   @override
   String get id;
@@ -241,7 +308,13 @@ abstract class _ProductEntity implements ProductEntity {
   @override
   int get quantity;
   @override
-  List<File?> get images;
+  List<File> get images;
+  @override
+  DateTime get expiresAt;
+  @override
+  DateTime get createAt;
+  @override
+  DateTime get updatedAt;
   @override
   @JsonKey(ignore: true)
   _$$ProductEntityImplCopyWith<_$ProductEntityImpl> get copyWith =>

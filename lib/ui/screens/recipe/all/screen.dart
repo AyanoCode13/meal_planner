@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:meal_planner/config/routing/routes/recipe.routes.dart';
+import 'package:meal_planner/data/config/routing/routes/recipe.routes.dart';
 import 'package:meal_planner/ui/screens/recipe/all/recipe.list.dart';
 import 'package:meal_planner/ui/viewModels/recipe.viewModel.dart';
 import 'package:provider/provider.dart';

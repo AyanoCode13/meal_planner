@@ -102,7 +102,7 @@ class _$LocalDatabase extends LocalDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `products` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `description` TEXT, `price` REAL NOT NULL, `quantity` INTEGER NOT NULL, PRIMARY KEY (`id`))');
+            'CREATE TABLE IF NOT EXISTS `products` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `description` TEXT, `price` REAL NOT NULL, `quantity` INTEGER NOT NULL, `expiersAt` TEXT NOT NULL, `createdAt` TEXT NOT NULL, `updatedAt` TEXT NOT NULL, PRIMARY KEY (`id`))');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `recipes` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `description` TEXT, `preparationTime` INTEGER NOT NULL, `createdAt` TEXT NOT NULL, `updatedAt` TEXT NOT NULL, PRIMARY KEY (`id`))');
         await database.execute(
@@ -165,7 +165,10 @@ class _$ProductDAO extends ProductDAO {
                   'name': item.name,
                   'description': item.description,
                   'price': item.price,
-                  'quantity': item.quantity
+                  'quantity': item.quantity,
+                  'expiersAt': _dateTimeConverter.encode(item.expiersAt),
+                  'createdAt': _dateTimeConverter.encode(item.createdAt),
+                  'updatedAt': _dateTimeConverter.encode(item.updatedAt)
                 }),
         _productModelUpdateAdapter = UpdateAdapter(
             database,
@@ -176,7 +179,10 @@ class _$ProductDAO extends ProductDAO {
                   'name': item.name,
                   'description': item.description,
                   'price': item.price,
-                  'quantity': item.quantity
+                  'quantity': item.quantity,
+                  'expiersAt': _dateTimeConverter.encode(item.expiersAt),
+                  'createdAt': _dateTimeConverter.encode(item.createdAt),
+                  'updatedAt': _dateTimeConverter.encode(item.updatedAt)
                 }),
         _productModelDeletionAdapter = DeletionAdapter(
             database,
@@ -187,7 +193,10 @@ class _$ProductDAO extends ProductDAO {
                   'name': item.name,
                   'description': item.description,
                   'price': item.price,
-                  'quantity': item.quantity
+                  'quantity': item.quantity,
+                  'expiersAt': _dateTimeConverter.encode(item.expiersAt),
+                  'createdAt': _dateTimeConverter.encode(item.createdAt),
+                  'updatedAt': _dateTimeConverter.encode(item.updatedAt)
                 });
 
   final sqflite.DatabaseExecutor database;
@@ -210,7 +219,10 @@ class _$ProductDAO extends ProductDAO {
             name: row['name'] as String,
             description: row['description'] as String?,
             price: row['price'] as double,
-            quantity: row['quantity'] as int));
+            quantity: row['quantity'] as int,
+            expiersAt: _dateTimeConverter.decode(row['expiersAt'] as String),
+            createdAt: _dateTimeConverter.decode(row['createdAt'] as String),
+            updatedAt: _dateTimeConverter.decode(row['updatedAt'] as String)));
   }
 
   @override
@@ -221,7 +233,10 @@ class _$ProductDAO extends ProductDAO {
             name: row['name'] as String,
             description: row['description'] as String?,
             price: row['price'] as double,
-            quantity: row['quantity'] as int),
+            quantity: row['quantity'] as int,
+            expiersAt: _dateTimeConverter.decode(row['expiersAt'] as String),
+            createdAt: _dateTimeConverter.decode(row['createdAt'] as String),
+            updatedAt: _dateTimeConverter.decode(row['updatedAt'] as String)),
         arguments: [id]);
   }
 
@@ -229,7 +244,7 @@ class _$ProductDAO extends ProductDAO {
   Future<List<ProductModel>> getProductsForRecipe(String recipeId) async {
     return _queryAdapter.queryList(
         'SELECT p.* FROM products p     INNER JOIN recipe_product_join rpj ON p.id = rpj.productId     WHERE rpj.recipeId = ?1',
-        mapper: (Map<String, Object?> row) => ProductModel(id: row['id'] as String, name: row['name'] as String, description: row['description'] as String?, price: row['price'] as double, quantity: row['quantity'] as int),
+        mapper: (Map<String, Object?> row) => ProductModel(id: row['id'] as String, name: row['name'] as String, description: row['description'] as String?, price: row['price'] as double, quantity: row['quantity'] as int, expiersAt: _dateTimeConverter.decode(row['expiersAt'] as String), createdAt: _dateTimeConverter.decode(row['createdAt'] as String), updatedAt: _dateTimeConverter.decode(row['updatedAt'] as String)),
         arguments: [recipeId]);
   }
 
@@ -397,6 +412,17 @@ class _$ImageDAO extends ImageDAO {
                   'isThumbnail': item.isThumbnail == null
                       ? null
                       : (item.isThumbnail! ? 1 : 0)
+                }),
+        _imageModelDeletionAdapter = DeletionAdapter(
+            database,
+            'images',
+            ['id', 'url'],
+            (ImageModel item) => <String, Object?>{
+                  'id': item.id,
+                  'url': item.url,
+                  'isThumbnail': item.isThumbnail == null
+                      ? null
+                      : (item.isThumbnail! ? 1 : 0)
                 });
 
   final sqflite.DatabaseExecutor database;
@@ -406,6 +432,8 @@ class _$ImageDAO extends ImageDAO {
   final QueryAdapter _queryAdapter;
 
   final InsertionAdapter<ImageModel> _imageModelInsertionAdapter;
+
+  final DeletionAdapter<ImageModel> _imageModelDeletionAdapter;
 
   @override
   Future<List<ImageModel>> findAll() async {
@@ -419,7 +447,7 @@ class _$ImageDAO extends ImageDAO {
   }
 
   @override
-  Future<List<ImageModel>> findByOwner(String ownerId) async {
+  Future<List<ImageModel>> findByOwner(String id) async {
     return _queryAdapter.queryList('SELECT * FROM images WHERE id = ?1',
         mapper: (Map<String, Object?> row) => ImageModel(
             id: row['id'] as String,
@@ -427,24 +455,28 @@ class _$ImageDAO extends ImageDAO {
             isThumbnail: row['isThumbnail'] == null
                 ? null
                 : (row['isThumbnail'] as int) != 0),
-        arguments: [ownerId]);
-  }
-
-  @override
-  Future<void> removeAll(String ownerId) async {
-    await _queryAdapter.queryNoReturn('DELETE * FROM images WHERE id = ?1',
-        arguments: [ownerId]);
+        arguments: [id]);
   }
 
   @override
   Future<void> insert(ImageModel data) async {
-    await _imageModelInsertionAdapter.insert(data, OnConflictStrategy.replace);
+    await _imageModelInsertionAdapter.insert(data, OnConflictStrategy.rollback);
   }
 
   @override
   Future<void> insertAll(List<ImageModel> data) async {
     await _imageModelInsertionAdapter.insertList(
-        data, OnConflictStrategy.replace);
+        data, OnConflictStrategy.rollback);
+  }
+
+  @override
+  Future<void> remove(ImageModel data) async {
+    await _imageModelDeletionAdapter.delete(data);
+  }
+
+  @override
+  Future<void> removeAll(List<ImageModel> data) async {
+    await _imageModelDeletionAdapter.deleteList(data);
   }
 }
 
