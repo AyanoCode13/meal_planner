@@ -1,7 +1,7 @@
 // recipe_product_join.dart
 import 'package:floor/floor.dart';
-import 'package:meal_planner/data/local/models/product.model.dart';
-import 'package:meal_planner/data/local/models/recipe.model.dart';
+import 'package:meal_planner/data/database/models/product.model.dart';
+import 'package:meal_planner/data/database/models/recipe.model.dart';
 
 @Entity(
   tableName: 'recipe_product_join',

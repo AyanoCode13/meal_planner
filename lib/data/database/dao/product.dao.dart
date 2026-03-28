@@ -1,7 +1,6 @@
 import 'package:floor/floor.dart';
-import 'package:meal_planner/data/local/models/product.model.dart';
+import 'package:meal_planner/data/database/models/product.model.dart';
 import 'package:meal_planner/domain/abstract/dao.dart';
-import 'package:meal_planner/domain/entities/product/product.entity.dart';
 
 @dao
 abstract class ProductDAO extends DAO<ProductModel, ProductModel> {

@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:meal_planner/data/local/dao/image.dao.dart';
-import 'package:meal_planner/data/local/models/image.model.dart';
+import 'package:meal_planner/data/database/dao/image.dao.dart';
+import 'package:meal_planner/data/database/models/image.model.dart';
 import 'package:meal_planner/domain/abstract/repository.dart';
 import 'package:meal_planner/service/file.storage.service.dart';
 import 'package:meal_planner/utils/result.dart';
@@ -72,6 +72,32 @@ class LocalFileRepository implements FileRepository {
       return Result.ok(res);
     } on Exception catch (e) {
       await _imageDAO.insertAll(data);
+      return Result.error(e);
+    }
+  }
+
+  @override
+  Future<Result<File?>> get(String folder, String fileName) async {
+    // TODO: implement get
+    try {
+      final res = await _fileStorageService.get(
+        folder: folder,
+        fileName: fileName,
+      );
+      if (res != null) return Result.ok(res);
+      return Result.ok(null);
+    } on Exception catch (e) {
+      return Result.error(e);
+    }
+  }
+
+  @override
+  Future<Result<List<File>>> getAll(String folder) async {
+    // TODO: implement getAll
+    try {
+      final res = await _fileStorageService.getAll(folder: folder);
+      return Result.ok(res);
+    } on Exception catch (e) {
       return Result.error(e);
     }
   }

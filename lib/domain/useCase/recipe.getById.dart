@@ -1,4 +1,4 @@
-import 'package:meal_planner/data/local/repository/local/local.repository.dart';
+import 'package:meal_planner/data/database/repository/local.repository.dart';
 import 'package:meal_planner/domain/abstract/use_case.dart';
 import 'package:meal_planner/domain/entities/product/product.entity.dart';
 import 'package:meal_planner/domain/entities/recipe/recipe.entity.dart';

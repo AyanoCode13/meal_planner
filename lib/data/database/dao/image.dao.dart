@@ -1,5 +1,5 @@
 import 'package:floor/floor.dart';
-import 'package:meal_planner/data/local/models/image.model.dart';
+import 'package:meal_planner/data/database/models/image.model.dart';
 
 @dao
 abstract class ImageDAO {

@@ -1,4 +1,6 @@
-import 'package:meal_planner/data/local/models/image.model.dart';
+import 'dart:io';
+
+import 'package:meal_planner/data/database/models/image.model.dart';
 import 'package:meal_planner/utils/result.dart';
 
 abstract class Repository<T> {
@@ -13,8 +15,11 @@ abstract class Repository<T> {
 }
 
 abstract class FileRepository {
+  Future<Result<File?>> get(String folder, String fileName);
+  Future<Result<List<File>>> getAll(String folder);
   Future<Result<String>> insert(ImageModel data);
   Future<Result<List<String>>> insertAll(List<ImageModel> data);
+  
   Future<Result<void>> delete(ImageModel data);
   Future<Result<void>> deleteAll(List<ImageModel> data);
 }

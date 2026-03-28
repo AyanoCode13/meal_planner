@@ -1,6 +1,5 @@
 import 'package:floor/floor.dart';
 import 'package:meal_planner/domain/domain.dart';
-import 'package:uuid/uuid.dart';
 
 @Entity(
   tableName: 'recipes',

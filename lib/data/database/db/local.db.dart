@@ -1,11 +1,11 @@
 import 'dart:async';
 
 import 'package:floor/floor.dart';
-import 'package:meal_planner/data/local/dao/image.dao.dart';
-import 'package:meal_planner/data/local/dao/recipe.dao.dart';
-import 'package:meal_planner/data/sql/recipe.sql.dart';
+import 'package:meal_planner/data/database/dao/image.dao.dart';
+import 'package:meal_planner/data/database/dao/recipe.dao.dart';
+import 'package:meal_planner/data/database/sql/recipe.sql.dart';
 import 'package:meal_planner/utils/converter.dart';
-import 'package:meal_planner/data/views/recipe.view.dart';
+import 'package:meal_planner/data/database/views/recipe.view.dart';
 import '../dao/dao.dart';
 import '../models/models.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;

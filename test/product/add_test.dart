@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:meal_planner/data/local/models/image.model.dart';
+import 'package:meal_planner/data/database/models/image.model.dart';
 import 'package:meal_planner/domain/useCase/product/add.product.useCase.dart';
 import 'package:meal_planner/utils/result.dart';
 import 'package:mockito/mockito.dart';

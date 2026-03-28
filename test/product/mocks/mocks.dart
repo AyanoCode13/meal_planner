@@ -1,4 +1,4 @@
-import 'package:meal_planner/data/local/repository/local/local.product.repository.dart';
+import 'package:meal_planner/data/database/repository/local.product.repository.dart';
 import 'package:meal_planner/domain/abstract/repository.dart';
 import 'package:mockito/annotations.dart';
 

@@ -1,6 +1,6 @@
 import 'package:floor/floor.dart';
-import 'package:meal_planner/data/local/models/recipe.model.dart';
-import 'package:meal_planner/data/views/views.dart';
+import 'package:meal_planner/data/database/models/recipe.model.dart';
+import 'package:meal_planner/data/database/views/views.dart';
 import 'package:meal_planner/domain/abstract/dao.dart';
 
 @dao

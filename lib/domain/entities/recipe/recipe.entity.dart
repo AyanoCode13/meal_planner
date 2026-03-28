@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:meal_planner/data/local/models/models.dart';
-import 'package:meal_planner/data/views/views.dart';
+import 'package:meal_planner/data/database/models/models.dart';
+import 'package:meal_planner/data/database/views/views.dart';
 import 'package:meal_planner/domain/dto/recipe/create.recipe.dto.dart';
 import 'package:meal_planner/domain/entities/product/product.entity.dart';
 import 'package:uuid/v4.dart';

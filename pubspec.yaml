@@ -7,6 +7,7 @@ environment:
   sdk: ^3.10.4
 
 dependencies:
+  google_fonts: ^6.2.1
   flutter:
     sdk: flutter
   floor: ^1.5.0
@@ -22,6 +23,9 @@ dependencies:
   freezed_annotation: ^2.4.4
   mockito: ^5.4.4
   meta: ^1.17.0
+  mobile_scanner: ^7.2.0
+  dio: ^5.9.2
+  flutter_dotenv: ^6.0.0
 
 dev_dependencies:
   flutter_test:
@@ -39,4 +43,5 @@ flutter:
   assets:
     - assets/
   uses-material-design: true
+
 

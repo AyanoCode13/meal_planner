@@ -1,5 +1,5 @@
-import 'package:meal_planner/data/local/dao/product.dao.dart';
-import 'package:meal_planner/data/local/models/product.model.dart';
+import 'package:meal_planner/data/database/dao/product.dao.dart';
+import 'package:meal_planner/data/database/models/product.model.dart';
 import 'package:meal_planner/domain/abstract/repository.dart';
 import 'package:meal_planner/domain/entities/product/product.entity.dart';
 import 'package:meal_planner/utils/result.dart';

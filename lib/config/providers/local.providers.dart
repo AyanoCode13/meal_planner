@@ -1,7 +1,7 @@
-import 'package:meal_planner/data/local/db/local.db.dart';
-import 'package:meal_planner/data/local/repository/local/local.file.repository.dart';
-import 'package:meal_planner/data/local/repository/local/local.product.repository.dart';
-import 'package:meal_planner/data/local/repository/local/local.recipe.repository.dart';
+import 'package:meal_planner/data/database/db/local.db.dart';
+import 'package:meal_planner/data/database/repository/local.file.repository.dart';
+import 'package:meal_planner/data/database/repository/local.product.repository.dart';
+import 'package:meal_planner/data/database/repository/local.recipe.repository.dart';
 import 'package:meal_planner/domain/abstract/repository.dart';
 import 'package:meal_planner/domain/abstract/use_case.dart';
 import 'package:meal_planner/domain/entities/product/product.entity.dart';
