@@ -109,7 +109,7 @@ abstract class LocalRepository<T, R, W> implements Repository<T> {
   @override
   Future<Result<void>> delete(T data) async {
     try {
-      await delete(data);
+      await removeModel(toWriteModel(data));
 
       return Result.ok(null);
     } on Exception catch (e) {

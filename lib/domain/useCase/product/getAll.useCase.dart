@@ -6,9 +6,9 @@ import 'package:meal_planner/utils/result.dart';
 import '../../abstract/repository.dart';
 import '../../entities/product/product.entity.dart';
 
-class GetAllProductUseCase extends GetAllUseCase<ProductEntity> {
+class GetAllProductsUseCase extends GetAllUseCase<ProductEntity> {
   final FileRepository _fileRepository;
-  GetAllProductUseCase({
+  GetAllProductsUseCase({
     required super.repository,
     required FileRepository fileRepository,
   }) : _fileRepository = fileRepository;

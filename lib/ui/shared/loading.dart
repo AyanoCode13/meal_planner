@@ -10,20 +10,22 @@ final class LoadingState extends StatelessWidget {
 
   
   @override
-  Widget build(Object context) {
+  Widget build(BuildContext context) {
     // TODO: implement build
-    return ListenableBuilder(
-      listenable: Listenable.merge(_commands),
-      builder: (context, child) {
-        if (_commands.any((command) => command.running)) {
-          return Center(child: CircularProgressIndicator.adaptive());
-        }
-        if(_commands.any((command) => command.failed)){
-          return Center(child: Text("Error"));
-        }
-        return child!;
-      },
-      child: ListenableBuilder(listenable: Listenable.merge(_notifiers), builder: _child),
+    return Material(
+      child: ListenableBuilder(
+        listenable: Listenable.merge(_commands),
+        builder: (context, child) {
+          if (_commands.any((command) => command.running)) {
+            return Center(child: CircularProgressIndicator.adaptive());
+          }
+          if(_commands.any((command) => command.failed)){
+            return Center(child: Text("Error"));
+          }
+          return child!;
+        },
+        child: ListenableBuilder(listenable: Listenable.merge(_notifiers), builder: _child),
+      ),
     );
   }
 }

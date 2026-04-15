@@ -42,12 +42,12 @@ class BaseViewModel<T> extends ChangeNotifier implements ViewModel<T> {
   late final ComplexCommand<void, T> update;
   late final ComplexCommand<void, T> delete;
   late final ComplexCommand<void, String> getById;
-  List<Command> get commands => [load,add,update,delete];
+  List<Command> get commands => [load,add, delete,update];
 
-  late List<T> _data;
+  List<T> _data = [];
   List<T> get data => _data;
 
-  late T? _selected;
+  T? _selected;
   T? get selected => _selected;
 
   final Logger _logger = Logger();
@@ -60,6 +60,7 @@ class BaseViewModel<T> extends ChangeNotifier implements ViewModel<T> {
       switch (res) {
         case Ok<List<T>>():
           _data = res.value;
+          _logger.i(res.value);
           return Result.ok(_logger.i("Fetched Data"));
         case Error<List<T>>():
           _logger.e(res.error);
@@ -77,7 +78,6 @@ class BaseViewModel<T> extends ChangeNotifier implements ViewModel<T> {
       final res = await _getByIdUseCase.call(data: id);
       switch (res) {
         case Ok<T?>():
-         
           return Result.ok( _logger.i("Fetched"));
         case Error<T?>():
           _logger.e(res.error);
@@ -97,7 +97,8 @@ class BaseViewModel<T> extends ChangeNotifier implements ViewModel<T> {
       final res = await _addUseCase.call(data: data);
       switch (res) {
         case Ok<void>():
-          _logger.i("Done");
+          _logger.i("Added Data");
+         _data = List.from(_data)..add(data);
           return Result.ok(res.value);
         case Error<void>():
           _logger.e(res.error);
@@ -129,11 +130,13 @@ class BaseViewModel<T> extends ChangeNotifier implements ViewModel<T> {
   @override
   Future<Result<void>> _delete(T data) async{
     // TODO: implement _delete
-    final res = await _deleteUseCase.call(data: data);
+    
     try{
+      final res = await _deleteUseCase.call(data: data);
       switch (res) {
         case Ok<void>():
-          _logger.i("Done");
+          _logger.i("Deleted");
+         _data = List.from(_data)..remove(data);
           return Result.ok(res.value);
         case Error<void>():
           _logger.e(res.error);

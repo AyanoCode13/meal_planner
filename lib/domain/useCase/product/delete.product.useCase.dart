@@ -21,7 +21,7 @@ class DeleteProductUseCase extends DeleteUseCase<ProductEntity> {
         .toList();
     final product = await super.call(data: data);
 
-    if (product is Ok) return product;
+    if (product is Error) return product; 
     return await _fileRepository.deleteAll(images);
   }
 }

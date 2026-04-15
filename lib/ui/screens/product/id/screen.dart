@@ -1,11 +1,5 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:meal_planner/ui/shared/loading.dart';
-import '../../../viewModels/view.models.dart';
-import 'package:provider/provider.dart';
 
 final class ViewAndEditProductScreen extends StatefulWidget {
   const ViewAndEditProductScreen({super.key});
@@ -49,7 +43,13 @@ class _ViewAndEditProductScreenState extends State<ViewAndEditProductScreen> {
   @override
   Widget build(BuildContext context) {
     return Material(
-      child: LoadingState(commands: [context.watch<ProductViewModel>().getById], notifiers: [context.watch<RecipeViewModel>()], child: (context,_){
+      child: Center(child: Text("Working"),)
+      
+    );
+  }
+}
+
+/*LoadingState(commands: [context.watch<ProductViewModel>().getById], notifiers: [context.watch<RecipeViewModel>()], child: (context,_){
         final product = context.watch<ProductViewModel>().selected;
         return SafeArea(
           child: CustomScrollView(
@@ -92,11 +92,7 @@ class _ViewAndEditProductScreenState extends State<ViewAndEditProductScreen> {
               )
             ],
           ),
-        );
-      }),
-    );
-  }
-}
+        );*/
 
 /*
 ListenableBuilder(

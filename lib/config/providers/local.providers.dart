@@ -7,11 +7,14 @@ import 'package:meal_planner/domain/abstract/use_case.dart';
 import 'package:meal_planner/domain/entities/product/product.entity.dart';
 import 'package:meal_planner/domain/entities/recipe/recipe.entity.dart';
 import 'package:meal_planner/domain/useCase/product/add.product.useCase.dart';
+import 'package:meal_planner/domain/useCase/product/delete.product.useCase.dart';
+import 'package:meal_planner/domain/useCase/product/getAll.useCase.dart';
+import 'package:meal_planner/domain/useCase/product/getById.useCase.dart';
+import 'package:meal_planner/domain/useCase/product/update.product.useCase.dart';
 import 'package:meal_planner/domain/useCase/recipe.getById.dart';
 import 'package:meal_planner/service/file.storage.service.dart';
 import 'package:meal_planner/ui/viewModels/product.viewModel.dart';
 import 'package:meal_planner/ui/viewModels/recipe.viewModel.dart';
-
 
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
@@ -33,22 +36,26 @@ Future<List<SingleChildWidget>> get localProviders async {
   final LocalProductRepository localProductRepository = LocalProductRepository(
     productDAO: productDAO,
   );
-  final getAllProductsUseCase = GetAllUseCase<ProductEntity>(
+  final getAllProductsUseCase = GetAllProductsUseCase(
     repository: localProductRepository as Repository<ProductEntity>,
+    fileRepository: localFileRepository,
   );
-  final getProductByIdUseCase = GetByIdUseCase<ProductEntity>(
+  final getProductByIdUseCase = GetByIdProductUseCase(
     repository: localProductRepository as Repository<ProductEntity>,
+    fileRepository: localFileRepository,
   );
   final addProductUseCase = AddProductUseCase(
     repository: localProductRepository as Repository<ProductEntity>,
     fileRepository: localFileRepository,
   );
-  final updateProductUseCase = UpdateUseCase<ProductEntity>(
+  final updateProductUseCase = UpdateProductUseCase(
     repository: localProductRepository as Repository<ProductEntity>,
+    fileRepository: localFileRepository,
   );
 
-  final deleteProductUseCase = DeleteUseCase<ProductEntity>(
+  final deleteProductUseCase = DeleteProductUseCase(
     repository: localProductRepository as Repository<ProductEntity>,
+    fileRepository: localFileRepository,
   );
 
   // Recipe Providers
@@ -74,15 +81,11 @@ Future<List<SingleChildWidget>> get localProviders async {
   );
 
   return [
-    ChangeNotifierProvider(
-      create: (context) => ProductViewModel(
-        getAllUseCase: getAllProductsUseCase,
-        getByIdUseCase: getProductByIdUseCase,
-        addUseCase: addProductUseCase,
-        updateUseCase: updateProductUseCase,
-        deleteUseCase: deleteProductUseCase,
-      ),
-    ),
+    Provider.value(value: getAllProductsUseCase),
+    Provider.value(value: getProductByIdUseCase),
+    Provider.value(value: addProductUseCase),
+    Provider.value(value: updateProductUseCase),
+    Provider.value(value: deleteProductUseCase),
 
     ChangeNotifierProvider(
       create: (context) => RecipeViewModel(
@@ -95,5 +98,3 @@ Future<List<SingleChildWidget>> get localProviders async {
     ),
   ];
 }
-
-class GetAllRecipesUseCase {}

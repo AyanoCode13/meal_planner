@@ -1,51 +1,39 @@
 import 'package:flutter/material.dart';
-import 'package:meal_planner/ui/screens/product/all/screen.dart';
-import 'package:meal_planner/ui/screens/recipe/all/screen.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../config/routing/routes/product.routes.dart';
+import '../../config/routing/routes/recipe.routes.dart';
 
 final class AppBottomNavigation extends StatefulWidget {
-  const AppBottomNavigation({super.key});
+  final Widget? _child;
+
+  const AppBottomNavigation({super.key, required Widget child})
+    : _child = child;
 
   @override
   State<AppBottomNavigation> createState() => _AppBottomNavigationState();
 }
 
 class _AppBottomNavigationState extends State<AppBottomNavigation> {
-  
-  int currentPageIndex = 0;
+  final List<String> _pages = [ProductRoutes.all, RecipeRoutes.all];
+
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
+    final location = GoRouterState.of(context).uri.toString();
+    final selectedIndex = _pages.indexWhere((t) => location.startsWith(t));
     // TODO: implement build
-     return Scaffold(
+    return Scaffold(
+      body: widget._child, // ← This is where the active route renders
       bottomNavigationBar: NavigationBar(
-        onDestinationSelected: (int index) {
-          setState(() {
-            currentPageIndex = index;
-          });
+        selectedIndex: selectedIndex < 0 ? 0 : selectedIndex,
+        onDestinationSelected: (index) {
+          context.go(_pages[index]);
         },
-        indicatorColor: Colors.amber,
-        selectedIndex: currentPageIndex,
-        destinations: const <Widget>[
-          NavigationDestination(
-            selectedIcon: Icon(Icons.home),
-            icon: Icon(Icons.home_outlined),
-            label: 'Home',
-          ),
-          NavigationDestination(
-            icon: Badge(child: Icon(Icons.notifications_sharp)),
-            label: 'Notifications',
-          ),
-          NavigationDestination(
-            icon: Badge(label: Text('2'), child: Icon(Icons.messenger_sharp)),
-            label: 'Messages',
-          ),
+        destinations: const [
+          NavigationDestination(icon: Icon(Icons.home), label: 'Products'),
+          NavigationDestination(icon: Icon(Icons.food_bank), label: 'Recipes'),
         ],
       ),
-      body: <Widget>[
-        ProductViewAllScreen(),
-        RecipesViewAllScreen(),
-        Scaffold(body: Center(child: Text("Meals")))
-      ][currentPageIndex],
     );
   }
-} 
+}

@@ -35,7 +35,7 @@ class LocalFileRepository implements FileRepository {
   @override
   Future<Result<List<String>>> insertAll(List<ImageModel> data) async {
     // TODO: implement insertAll
-
+    if(data.isEmpty) return Result.ok([]);
     try {
       await _imageDAO.insertAll(data);
       final files = data.map((e) => File(e.url)).toList();
@@ -66,6 +66,7 @@ class LocalFileRepository implements FileRepository {
   @override
   Future<Result<void>> deleteAll(List<ImageModel> data) async {
     // TODO: implement deleteAll
+    if(data.isEmpty) return Result.ok(null);
     try {
       final res = await _imageDAO.removeAll(data);
       await _fileStorageService.deleteAll(folder: data[0].id);
@@ -102,3 +103,4 @@ class LocalFileRepository implements FileRepository {
     }
   }
 }
+

@@ -15,7 +15,7 @@ final files = [file1, file2];
 
 // Products
 final product1 = ProductEntity.create(
-  dto: CreateProductDTO(name: "Product 1", images: files),
+  dto: CreateProductDTO(name: "Product 1"),
 );
 final product2 = ProductEntity.create(dto: CreateProductDTO(name: "Product 2"));
 
