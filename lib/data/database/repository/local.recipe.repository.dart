@@ -1,7 +1,7 @@
 import 'package:meal_planner/data/database/dao/recipe.dao.dart';
-import 'package:meal_planner/data/database/dao/recipes_and_products.dao.dart';
+import 'package:meal_planner/data/database/dao/joins/recipes_and_products.dao.dart';
 import 'package:meal_planner/data/database/models/recipe.model.dart';
-import 'package:meal_planner/data/database/models/recipes_and_products.dart';
+import 'package:meal_planner/data/database/models/joins/recipes_and_products.dart';
 import 'package:meal_planner/data/database/views/recipe.view.dart';
 import 'package:meal_planner/domain/abstract/repository.dart';
 import 'package:meal_planner/domain/entities/recipe/recipe.entity.dart';

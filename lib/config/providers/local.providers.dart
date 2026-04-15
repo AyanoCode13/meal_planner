@@ -1,4 +1,5 @@
 import 'package:meal_planner/data/database/db/local.db.dart';
+import 'package:meal_planner/data/database/repository/joins/local.category_and_product.repository.dart';
 import 'package:meal_planner/data/database/repository/local.file.repository.dart';
 import 'package:meal_planner/data/database/repository/local.product.repository.dart';
 import 'package:meal_planner/data/database/repository/local.recipe.repository.dart';
@@ -13,28 +14,28 @@ import 'package:meal_planner/domain/useCase/product/getById.useCase.dart';
 import 'package:meal_planner/domain/useCase/product/update.product.useCase.dart';
 import 'package:meal_planner/domain/useCase/recipe.getById.dart';
 import 'package:meal_planner/service/file.storage.service.dart';
-import 'package:meal_planner/ui/viewModels/product.viewModel.dart';
 import 'package:meal_planner/ui/viewModels/recipe.viewModel.dart';
-
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 
+import '../../data/database/repository/joins/local.recipe_and_product.repository.dart';
+
 Future<List<SingleChildWidget>> get localProviders async {
   await LocalDatabase.initialize();
+  final db = LocalDatabase.instance;
   final fileStorageService = FileStorageService();
-  final productDAO = LocalDatabase.instance.productDAO;
-  final recipeDAO = LocalDatabase.instance.recipeDAO;
-  final recipesAndProductsDAO = LocalDatabase.instance.recipesAndProductsDAO;
-  final imageDAO = LocalDatabase.instance.imageDAO;
-
   final localFileRepository = LocalFileRepository(
-    imageDAO: imageDAO,
+    imageDAO: db.imageDAO,
     fileStorageService: fileStorageService,
   );
 
+  // Join Repositories
+  final localCategoriesAndProductsRepository = CategoriesAndProductsRepository(categoriesAndProductsDAO: db.categoriesAndProductsDAO);
+  final localRecipesAndProductsRepository = RecipesAndProductsRepository(recipesAndProductsDAO: db.recipesAndProductsDAO);
+
   // Product Providers
   final LocalProductRepository localProductRepository = LocalProductRepository(
-    productDAO: productDAO,
+    productDAO: db.productDAO,
   );
   final getAllProductsUseCase = GetAllProductsUseCase(
     repository: localProductRepository as Repository<ProductEntity>,
@@ -45,6 +46,7 @@ Future<List<SingleChildWidget>> get localProviders async {
     fileRepository: localFileRepository,
   );
   final addProductUseCase = AddProductUseCase(
+    categoriesAndProductsRepository: localCategoriesAndProductsRepository,
     repository: localProductRepository as Repository<ProductEntity>,
     fileRepository: localFileRepository,
   );
@@ -60,8 +62,8 @@ Future<List<SingleChildWidget>> get localProviders async {
 
   // Recipe Providers
   final LocalRecipeRepository localRecipeRepsitory = LocalRecipeRepository(
-    recipeDAO: recipeDAO,
-    recipesAndProductsDAO: recipesAndProductsDAO,
+    recipeDAO: db.recipeDAO,
+    recipesAndProductsDAO: db.recipesAndProductsDAO,
   );
   final getAllRecipesUseCase = GetAllUseCase<RecipeEntity>(
     repository: localRecipeRepsitory,
